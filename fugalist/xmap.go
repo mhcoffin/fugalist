@@ -141,7 +141,7 @@ func CreateCombosForColor(techniques string, color *Color, p *Project, middleC s
 		if err != nil {
 			return nil, fmt.Errorf("failed to create combo for pigment: %w", err)
 		}
-		cond, err := lex.Input(branch.Condition).ParseCondition()
+		cond, err := Input(branch.Condition).ParseCondition()
 		if err != nil {
 			return nil, fmt.Errorf(`failed to parse condition: "%s"`, branch.Condition)
 		}
