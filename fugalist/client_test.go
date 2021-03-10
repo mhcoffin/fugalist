@@ -1,4 +1,4 @@
-package fugalistdb
+package fugalist
 
 import (
 	"context"

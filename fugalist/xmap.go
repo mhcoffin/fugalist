@@ -1,4 +1,4 @@
-package fugalistdb
+package fugalist
 
 import "C"
 import (
@@ -292,3 +292,4 @@ func CreateTechniqueAddOn(modifier Tint, middleC string) (*doricolib.TechniqueAd
 		SwitchOffActions: *stop,
 	}, nil
 }
+

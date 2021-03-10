@@ -1,4 +1,4 @@
-package fugalistdb
+package fugalist
 
 import (
 	"cloud.google.com/go/firestore"

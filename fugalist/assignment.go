@@ -1,4 +1,4 @@
-package fugalistdb
+package fugalist
 
 type AssignmentRow = struct {
 	Techniques []TechniqueId
