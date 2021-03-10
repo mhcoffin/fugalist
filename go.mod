@@ -1,3 +1,3 @@
-module github.com/mhcoffin/fugalist
+module github.com/mhcoffin/fugalistdb
 
 go 1.15
