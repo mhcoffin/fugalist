@@ -3,7 +3,6 @@ package fugalist
 import "C"
 import (
 	"fmt"
-	"github.com/mhcoffin/expmap/pkg/lex"
 	"github.com/mhcoffin/go-doricolib/doricolib"
 	"math"
 	"sort"
