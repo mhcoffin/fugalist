@@ -30,8 +30,8 @@ func NewClient(uid string) (Client, context.Context, error) {
 	return Client{client, uid}, ctx, nil
 }
 
-func (c *Client) ReadProject(ctx context.Context, pid ProjectId, version int) (*Project, error) {
-	path := fmt.Sprintf("Users/%s/Projects/%s.%d", c.uid, pid, version)
+func (c *Client) ReadProject(ctx context.Context, pid ProjectId) (*Project, error) {
+	path := fmt.Sprintf("Users/%s/Projects/%s", c.uid, pid)
 	// fmt.Print(path)
 	snap, err := c.client.Doc(path).Get(ctx)
 	if err != nil {

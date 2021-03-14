@@ -8,7 +8,7 @@ import (
 /**
  * Creates a ScoreLib by reading a project from fugalist and putting it all together.
  */
-func CreateDoricoLib(uid string, pid string, version int) (*doricolib.ScoreLib, error) {
+func CreateDoricoLib(uid string, pid string) (*doricolib.ScoreLib, error) {
 	db, ctx, err := NewClient(uid)
 	if err != nil {
 		log.Fatalf("failed to create firestore client: %s", err)
@@ -21,7 +21,7 @@ func CreateDoricoLib(uid string, pid string, version int) (*doricolib.ScoreLib, 
 	if !ok {
 		log.Fatalf("summary does not contain project %v", pid)
 	}
-	project, err := db.ReadProject(ctx, pid, version)
+	project, err := db.ReadProject(ctx, pid)
 	if err != nil {
 		log.Fatalf("failed: %s", err)
 	}
