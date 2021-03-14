@@ -26,8 +26,8 @@ func CreateExpressionMap(summary ProjectSummary, p *Project) (*doricolib.Express
 		InheritanceMask:               "0",
 		Creator:                       "",
 		Description:                   summary.Description,
-		Version:                       fmt.Sprintf("%d", p.Metadata.Version),
-		PluginNames:                   p.Metadata.Plugins,
+		Version:                       fmt.Sprintf("%d", p.Version),
+		PluginNames:                   summary.Plugins,
 		AutoMutualExclusion:           false,
 		AllowMultipleNotesAtSamePitch: false,
 		InitSwitchData: doricolib.InitSwitchData{
@@ -76,7 +76,7 @@ func CreateCombos(p *Project) ([]*doricolib.PlayingTechniqueCombination, error) 
 
 		pigment, isPigment := p.Pigments[soundId]
 		if isPigment {
-			combo, err := CreateComboForPigment(techniques, pigment, p.Metadata.MiddleC)
+			combo, err := CreateComboForPigment(techniques, pigment, p.MiddleC)
 			if err != nil {
 				return nil, fmt.Errorf("failed to create combo for pigment: %w", err)
 			}
@@ -86,7 +86,7 @@ func CreateCombos(p *Project) ([]*doricolib.PlayingTechniqueCombination, error) 
 			if !isColor {
 				return nil, fmt.Errorf("no sound for %s (key %s)", techniques, key)
 			}
-			combos, err := CreateCombosForColor(techniques, color, p, p.Metadata.MiddleC)
+			combos, err := CreateCombosForColor(techniques, color, p, p.MiddleC)
 			if err != nil {
 				return nil, fmt.Errorf("failed to create combos for color: %w", err)
 			}
@@ -260,7 +260,7 @@ func CreateTechniqueAddOns(p *Project) (*doricolib.TechniqueAddOnList, error) {
 	addOns := make([]doricolib.TechniqueAddOn, len(p.Tints))
 	k := 0
 	for _, modifier := range p.Tints {
-		addOn, err := CreateTechniqueAddOn(*modifier, p.Metadata.MiddleC)
+		addOn, err := CreateTechniqueAddOn(*modifier, p.MiddleC)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create add-on: %w", err)
 		}
