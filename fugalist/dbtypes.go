@@ -74,7 +74,6 @@ type Tint = struct {
 type Project struct {
 	ProjectId   string
 	Owner       string
-	Version     int
 	Public      bool
 	CreateTime  time.Time
 	ModifyTime  time.Time
@@ -86,21 +85,6 @@ type Project struct {
 	URL         string
 	MiddleC		string
 }
-
-// export interface Project {
-// ProjectID: ProjectId;
-// Version: number;
-// CreateTime: Timestamp;
-// ModifyTime: Timestamp;
-// Name: string;
-// MiddleC: string
-// Axes: Record<string, Axis>;
-// Pigments: Record<string, Pigment>;
-// Tints: Record<string, Tint>
-// Palette: Record<string, Color>
-// Assignments: Assignments;
-// URL: string | null;
-// }
 
 type ProjectSummary struct {
 	CreateTime       time.Time

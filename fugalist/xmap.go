@@ -26,7 +26,7 @@ func CreateExpressionMap(summary ProjectSummary, p *Project) (*doricolib.Express
 		InheritanceMask:               "0",
 		Creator:                       "",
 		Description:                   summary.Description,
-		Version:                       fmt.Sprintf("%d", p.Version),
+		Version:                       fmt.Sprintf("%d", summary.Version),
 		PluginNames:                   summary.Plugins,
 		AutoMutualExclusion:           false,
 		AllowMultipleNotesAtSamePitch: false,
