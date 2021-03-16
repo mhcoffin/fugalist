@@ -1,6 +1,7 @@
 package fugalist
 
 import (
+	"context"
 	"github.com/mhcoffin/go-doricolib/doricolib"
 	"log"
 )
@@ -9,11 +10,12 @@ import (
  * Creates a ScoreLib by reading a project from fugalist and putting it all together.
  */
 func CreateDoricoLib(uid string, pid string) (*doricolib.ScoreLib, error) {
-	db, ctx, err := NewClient(uid)
+	ctx := context.Background()
+	db, err := NewClient(ctx, uid)
 	if err != nil {
 		log.Fatalf("failed to create firestore client: %s", err)
 	}
-	userInfo, err := db.ReadUserInfo(ctx, uid)
+	userInfo, err := db.ReadUserInfo(ctx)
 	if err != nil {
 		log.Fatalf("failed to read user info: %v", err)
 	}

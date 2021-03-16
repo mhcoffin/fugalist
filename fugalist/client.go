@@ -8,13 +8,12 @@ import (
 
 const projectID = "fugalist"
 
-func client() (*firestore.Client, context.Context, error) {
-	ctx := context.Background()
+func client(ctx context.Context) (*firestore.Client, error) {
 	client, err := firestore.NewClient(ctx, projectID)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return client, ctx, nil
+	return client, nil
 }
 
 type Client struct {
@@ -22,32 +21,29 @@ type Client struct {
 	uid    string
 }
 
-func NewClient(uid string) (Client, context.Context, error) {
-	client, ctx, err := client()
+func NewClient(ctx context.Context, uid string) (Client, error) {
+	client, err := client(ctx)
 	if err != nil {
-		return Client{}, nil, err
+		return Client{}, err
 	}
-	return Client{client, uid}, ctx, nil
+	return Client{client, uid}, nil
 }
 
 func (c *Client) ReadProject(ctx context.Context, pid ProjectId) (*Project, error) {
-	path := fmt.Sprintf("Users/%s/Projects/%s", c.uid, pid)
-	// fmt.Print(path)
-	snap, err := c.client.Doc(path).Get(ctx)
+	snap, err := c.client.Collection("Users").Doc(c.uid).Collection("Projects").Doc(pid).Get(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to read document: %w", err)
 	}
 	var p Project
 	err = snap.DataTo(&p)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse data: %w", err)
 	}
 	return &p, nil
 }
 
-func (c *Client) ReadUserInfo(ctx context.Context, uid string) (*UserInfo, error) {
-	path := fmt.Sprintf("Users/%s", uid)
-	snap, err := c.client.Doc(path).Get(ctx)
+func (c *Client) ReadUserInfo(ctx context.Context) (*UserInfo, error) {
+	snap, err := c.client.Collection("Users").Doc(c.uid).Get(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -57,4 +53,23 @@ func (c *Client) ReadUserInfo(ctx context.Context, uid string) (*UserInfo, error
 		return nil, err
 	}
 	return &ui, nil
+}
+
+// Set the URL and the URLTimestamp of a project
+func (c *Client) SetUrl(ctx context.Context, pid string, url string) error {
+	project := c.client.Collection("Users").Doc(c.uid).Collection("Projects").Doc(pid)
+	_, err := project.Update(ctx, []firestore.Update{
+		{
+			Path:  "URL",
+			Value: url,
+		},
+		{
+			Path:  "URLTimestamp",
+			Value: firestore.ServerTimestamp,
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("failed to set url: %w", err)
+	}
+	return nil
 }

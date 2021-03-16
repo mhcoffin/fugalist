@@ -72,18 +72,18 @@ type Tint = struct {
 }
 
 type Project struct {
-	ProjectId   string
-	Owner       string
-	Public      bool
-	CreateTime  time.Time
-	ModifyTime  time.Time
-	Axes        map[string]Axis
-	Pigments    map[PigmentId]*Pigment
-	Palette     map[ColorId]*Color
-	Tints       map[string]*Tint
-	Assignments map[string]Assignment
-	URL         string
-	MiddleC		string
+	ProjectId    string
+	Public       bool
+	CreateTime   time.Time
+	ModifyTime   time.Time
+	Axes         map[string]Axis
+	Pigments     map[PigmentId]*Pigment
+	Palette      map[ColorId]*Color
+	Tints        map[string]*Tint
+	Assignments  map[string]Assignment
+	URL          *string
+	URLTimestamp *time.Time
+	MiddleC      string
 }
 
 type ProjectSummary struct {
@@ -94,7 +94,6 @@ type ProjectSummary struct {
 	Public           bool
 	Description      string
 	Plugins          string
-	ExpressionMapURL string
 }
 
 type UserInfo struct {
