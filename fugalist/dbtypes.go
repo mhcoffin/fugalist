@@ -87,16 +87,26 @@ type Project struct {
 }
 
 type ProjectSummary struct {
-	CreateTime       time.Time
-	ProjectID        string
-	Version          int
-	Name             string
-	Public           bool
-	Description      string
-	Plugins          string
+	CreateTime  time.Time
+	ProjectID   string
+	Version     int
+	Name        string
+	Public      bool
+	Description string
+	Plugins     string
 }
 
 type UserInfo struct {
 	Projects    map[string]ProjectSummary `firestore:"Projects"`
 	Preferences map[string]string         `firestore:"Preferences"`
+}
+
+type Share struct {
+	ID              string
+	CreateTime      time.Time `firestore:",serverTimestamp"`
+	UID             string
+	UserDisplayName string
+	PID             string
+	Summary         ProjectSummary
+	Project         *Project
 }
