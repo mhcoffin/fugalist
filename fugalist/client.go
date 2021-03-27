@@ -81,7 +81,7 @@ func (c *Client) WriteShare(ctx context.Context, share Share) error {
 	batch.Set(shareDoc, share)
 	batch.Update(userDoc, []firestore.Update{
 		{
-			Path:  fmt.Sprintf("Projects.%s.SharedTime", share.PID),
+			Path:  fmt.Sprintf("Projects.%s.ShareTime", share.PID),
 			Value: firestore.ServerTimestamp,
 		},
 	})
