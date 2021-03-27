@@ -102,7 +102,6 @@ type UserInfo struct {
 }
 
 type Share struct {
-	ID              string
 	CreateTime      time.Time `firestore:",serverTimestamp"`
 	UID             string
 	UserDisplayName string
