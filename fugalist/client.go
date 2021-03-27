@@ -75,11 +75,19 @@ func (c *Client) SetUrl(ctx context.Context, pid string, url string) error {
 }
 
 func (c *Client) WriteShare(ctx context.Context, share Share) error {
-	path := c.client.Collection("Shared").Doc(fmt.Sprintf("%s.%d", share.PID, share.Summary.Version))
-	_, err := path.Create(ctx, share)
+	shareDoc := c.client.Collection("Shared").Doc(fmt.Sprintf("%s.%d", share.PID, share.Summary.Version))
+	userDoc := c.client.Collection("Users").Doc(share.UID)
+	batch := c.client.Batch()
+	batch.Set(shareDoc, share)
+	batch.Update(userDoc, []firestore.Update{
+		{
+			Path:  fmt.Sprintf("Projects.%s.SharedTime", share.PID),
+			Value: firestore.ServerTimestamp,
+		},
+	})
+	_, err := batch.Commit(ctx)
 	if err != nil {
-		return fmt.Errorf("failed to write share: %w", err)
+		return fmt.Errorf("failed to share project %s.%s.%d: %w", share.UID, share.PID, share.Summary.Version, err)
 	}
 	return nil
 }
-
