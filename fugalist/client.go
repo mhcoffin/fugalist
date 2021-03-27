@@ -75,7 +75,7 @@ func (c *Client) SetUrl(ctx context.Context, pid string, url string) error {
 }
 
 func (c *Client) WriteShare(ctx context.Context, share Share) error {
-	path := c.client.Collection("Shared").Doc(share.ID)
+	path := c.client.Collection("Shared").Doc(fmt.Sprintf("%s.%d", share.PID, share.Summary.Version))
 	_, err := path.Create(ctx, share)
 	if err != nil {
 		return fmt.Errorf("failed to write share: %w", err)
