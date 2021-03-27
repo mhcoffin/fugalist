@@ -74,3 +74,12 @@ func (c *Client) SetUrl(ctx context.Context, pid string, url string) error {
 	return nil
 }
 
+func (c *Client) WriteShare(ctx context.Context, share Share) error {
+	path := c.client.Collection("Shared").Doc(share.ID)
+	_, err := path.Create(ctx, share)
+	if err != nil {
+		return fmt.Errorf("failed to write share: %w", err)
+	}
+	return nil
+}
+
