@@ -15,19 +15,15 @@ func CreateDoricoLib(uid string, pid string) (*doricolib.ScoreLib, error) {
 	if err != nil {
 		log.Fatalf("failed to create firestore client: %s", err)
 	}
-	userInfo, err := db.ReadUserInfo(ctx)
+	projectSummary, err := db.ReadProjectSummary(ctx, pid)
 	if err != nil {
-		log.Fatalf("failed to read user info: %v", err)
-	}
-	projectSummary, ok := userInfo.Projects[pid]
-	if !ok {
-		log.Fatalf("summary does not contain project %v", pid)
+		log.Fatalf("failed to read user project summary: %v", err)
 	}
 	project, err := db.ReadProject(ctx, pid)
 	if err != nil {
 		log.Fatalf("failed: %s", err)
 	}
-	xmap, err := CreateExpressionMap(projectSummary, project)
+	xmap, err := CreateExpressionMap(*projectSummary, project)
 	if err != nil {
 		log.Fatal(err)
 	}
