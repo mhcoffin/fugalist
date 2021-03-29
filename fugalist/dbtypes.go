@@ -122,4 +122,5 @@ type Share struct {
 	UserDisplayName string
 	PID             string
 	Summary         ProjectSummary
+	SearchTags		[]string
 }
