@@ -42,29 +42,29 @@ func (c *Client) ReadProject(ctx context.Context, pid ProjectId) (*Project, erro
 	return &p, nil
 }
 
-func (c *Client) ReadUserInfo(ctx context.Context) (*UserInfo, error) {
-	snap, err := c.client.Collection("Users").Doc(c.uid).Get(ctx)
+func (c *Client) ReadProjectSummary(ctx context.Context, pid string) (*ProjectSummary, error) {
+	snap, err := c.client.Collection("Users").Doc(c.uid).Collection("Summaries").Doc(pid).Get(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to read project summary for %s.%s: %w", c.uid, pid, err)
 	}
-	var ui UserInfo
-	err = snap.DataTo(&ui)
+	result := &ProjectSummary{}
+	err = snap.DataTo(result)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to unmarshall project summary for %s.%s: %w", c.uid, pid, err)
 	}
-	return &ui, nil
+	return result, nil
 }
 
-// Set the URL and the URLTimestamp of a project
+// After generating an expression map, set the URL and timestamp in the summary.
 func (c *Client) SetUrl(ctx context.Context, pid string, url string) error {
-	project := c.client.Collection("Users").Doc(c.uid).Collection("Projects").Doc(pid)
-	_, err := project.Update(ctx, []firestore.Update{
+	summary := c.client.Collection("Users").Doc(c.uid).Collection("Summaries").Doc(pid)
+	_, err := summary.Update(ctx, []firestore.Update{
 		{
-			Path:  "URL",
+			Path:  "ExpressionMapURL",
 			Value: url,
 		},
 		{
-			Path:  "URLTimestamp",
+			Path:  "ExpressionMapTime",
 			Value: firestore.ServerTimestamp,
 		},
 	})
@@ -76,13 +76,17 @@ func (c *Client) SetUrl(ctx context.Context, pid string, url string) error {
 
 func (c *Client) WriteShare(ctx context.Context, share Share) error {
 	shareDoc := c.client.Collection("Shared").Doc(fmt.Sprintf("%s.%d", share.PID, share.Summary.Version))
-	userDoc := c.client.Collection("Users").Doc(share.UID)
+	summaryDoc := c.client.Collection("Users").Doc(share.UID).Collection("Summaries").Doc(share.PID)
 	batch := c.client.Batch()
 	batch.Set(shareDoc, share)
-	batch.Update(userDoc, []firestore.Update{
+	batch.Update(summaryDoc, []firestore.Update{
 		{
-			Path:  fmt.Sprintf("Projects.%s.ShareTime", share.PID),
+			Path:  "ShareTime",
 			Value: firestore.ServerTimestamp,
+		},
+		{
+			Path: "Version",
+			Value: firestore.Increment(1),
 		},
 	})
 	_, err := batch.Commit(ctx)
