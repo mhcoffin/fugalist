@@ -1,6 +1,8 @@
 package fugalist
 
-import "time"
+import (
+	"time"
+)
 
 type PaletteSoundId = string
 
@@ -86,19 +88,32 @@ type Project struct {
 	MiddleC      string
 }
 
+type AudioExample struct {
+	Id    string
+	Order float64
+	Name  string
+	URL   string
+	Score string
+}
+
 type ProjectSummary struct {
-	CreateTime  time.Time
-	ProjectID   string
-	Version     int
-	Name        string
-	Public      bool
-	Description string
-	Plugins     string
+	CreateTime        time.Time
+	ModifyTime        time.Time
+	ShareTime         time.Time `firestore:",serverTimestamp"`
+	ProjectID         string
+	Version           int
+	Name              string
+	Public            bool
+	Description       string
+	Plugins           string
+	Tags              string
+	Examples          map[string]AudioExample
+	ExpressionMapURL  string
+	ExpressionMapTime string
 }
 
 type UserInfo struct {
-	Projects    map[string]ProjectSummary `firestore:"Projects"`
-	Preferences map[string]string         `firestore:"Preferences"`
+	Preferences map[string]string `firestore:"Preferences"`
 }
 
 type Share struct {
