@@ -109,7 +109,7 @@ type ProjectSummary struct {
 	Tags              string
 	Examples          map[string]AudioExample
 	ExpressionMapURL  string
-	ExpressionMapTime string
+	ExpressionMapTime time.Time
 }
 
 type UserInfo struct {
