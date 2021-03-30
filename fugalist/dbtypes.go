@@ -123,4 +123,5 @@ type Share struct {
 	PID             string
 	Summary         ProjectSummary
 	SearchTags		[]string
+	Superseded		bool
 }
