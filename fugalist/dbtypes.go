@@ -117,11 +117,12 @@ type UserInfo struct {
 }
 
 type Share struct {
+	ID              string
 	CreateTime      time.Time `firestore:",serverTimestamp"`
 	UID             string
 	UserDisplayName string
 	PID             string
 	Summary         ProjectSummary
-	SearchTags		[]string
-	Superseded		bool
+	SearchTags      []string
+	Superseded      bool
 }
