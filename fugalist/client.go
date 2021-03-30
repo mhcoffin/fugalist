@@ -74,8 +74,16 @@ func (c *Client) SetUrl(ctx context.Context, pid string, url string) error {
 	return nil
 }
 
+/**
+Writes the Share record and marks the previous Share record as "Superseded". Also increments
+the version in the summary.
+*/
 func (c *Client) WriteShare(ctx context.Context, share Share) error {
 	shareDoc := c.client.Collection("Shared").Doc(fmt.Sprintf("%s.%d", share.PID, share.Summary.Version))
+	var prevShareDoc *firestore.DocumentRef = nil
+	if share.Summary.Version > 1 {
+		prevShareDoc = c.client.Collection("Shared").Doc(fmt.Sprintf("%s.%d", share.PID, share.Summary.Version-1))
+	}
 	summaryDoc := c.client.Collection("Users").Doc(share.UID).Collection("Summaries").Doc(share.PID)
 	batch := c.client.Batch()
 	batch.Set(shareDoc, share)
@@ -85,10 +93,18 @@ func (c *Client) WriteShare(ctx context.Context, share Share) error {
 			Value: firestore.ServerTimestamp,
 		},
 		{
-			Path: "Version",
+			Path:  "Version",
 			Value: firestore.Increment(1),
 		},
 	})
+	if prevShareDoc != nil {
+		batch.Update(prevShareDoc, []firestore.Update{
+			{
+				Path:  "Superseded",
+				Value: true,
+			},
+		})
+	}
 	_, err := batch.Commit(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to share project %s.%s.%d: %w", share.UID, share.PID, share.Summary.Version, err)
