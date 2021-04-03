@@ -125,6 +125,8 @@ type Share struct {
 	UserDisplayName string
 	PID             string
 	Summary         ProjectSummary
-	SearchTags      []string
+	Vendor          string
+	Instruments     []string
+	OtherTags       []string
 	Superseded      bool
 }
