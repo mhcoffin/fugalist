@@ -106,7 +106,9 @@ type ProjectSummary struct {
 	Public            bool
 	Description       string
 	Plugins           string
-	Tags              string
+	Vendor            string
+	Instruments       string
+	OtherTags         string
 	Examples          map[string]AudioExample
 	ExpressionMapURL  string
 	ExpressionMapTime time.Time
