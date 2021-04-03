@@ -128,5 +128,6 @@ type Share struct {
 	Vendor          string
 	Instruments     []string
 	OtherTags       []string
+	Tags            []string
 	Superseded      bool
 }
