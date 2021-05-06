@@ -128,6 +128,7 @@ type Share struct {
 	CreateTime      time.Time `firestore:",serverTimestamp"`
 	UID             string
 	UserDisplayName string
+	PhotoURL		string
 	PID             string
 	Summary         ProjectSummary
 	Vendor          string
