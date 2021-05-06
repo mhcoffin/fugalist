@@ -115,7 +115,12 @@ type ProjectSummary struct {
 }
 
 type UserInfo struct {
-	Preferences map[string]string `firestore:"Preferences"`
+	CanonicalDisplayName string
+	CreationTime         time.Time `firestore:"serverTimestamp"`
+	DisplayName          string
+	Email                string
+	PhotoURL             string
+	Theme                string
 }
 
 type Share struct {

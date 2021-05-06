@@ -29,6 +29,19 @@ func NewClient(ctx context.Context, uid string) (Client, error) {
 	return Client{client, uid}, nil
 }
 
+func (c *Client) ReadUserInfo(ctx context.Context) (*UserInfo, error) {
+	snap, err := c.client.Collection("Users").Doc(c.uid).Get(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read user info: %w", err)
+	}
+	var result UserInfo
+	err = snap.DataTo(&result)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode user info: %w", err)
+	}
+	return &result, nil
+}
+
 func (c *Client) ReadProject(ctx context.Context, pid ProjectId) (*Project, error) {
 	snap, err := c.client.Collection("Users").Doc(c.uid).Collection("Projects").Doc(pid).Get(ctx)
 	if err != nil {
@@ -74,10 +87,8 @@ func (c *Client) SetUrl(ctx context.Context, pid string, url string) error {
 	return nil
 }
 
-/**
-Writes the Share record and marks the previous Share record as "Superseded". Also increments
-the version in the summary.
-*/
+// WriteShare writes the Share record and marks the previous Share record as "Superseded". Also increments
+// the version in the summary.
 func (c *Client) WriteShare(ctx context.Context, share Share) error {
 	shareDoc := c.client.Collection("Shared").Doc(fmt.Sprintf("%s.%d", share.PID, share.Summary.Version))
 	var prevShareDoc *firestore.DocumentRef = nil

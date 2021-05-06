@@ -110,10 +110,12 @@ func CreateUser(uid string, summaries ...ProjectSummary) error {
 		proj[summary.ProjectID] = summary
 	}
 	user := UserInfo{
-		Projects: proj,
-		Preferences: map[string]string{
-			"theme": "dark",
-		},
+		CanonicalDisplayName: "fredflintstone",
+		CreationTime: time.Time{},
+		DisplayName: "Fred Flintstone",
+		Email: "fred@bedrock.com",
+		PhotoURL: "https://foo/bar",
+		Theme: "dark",
 	}
 	_, err := firestoreClient.Collection("Users").Doc(uid).Create(ctx, user)
 	return err
@@ -136,11 +138,7 @@ func TestClient_ReadUserInfo(t *testing.T) {
 	assert.Nil(t, err)
 	x, err := cl.ReadUserInfo(ctx)
 	assert.Nil(t, err)
-	assert.WithinDuration(t, summary1.CreateTime, x.Projects[summary1.ProjectID].CreateTime, time.Nanosecond)
-	assert.Equal(t, summary1.ProjectID, x.Projects[summary1.ProjectID].ProjectID)
-	assert.Equal(t, summary1.Name, x.Projects[summary1.ProjectID].Name)
-	assert.Equal(t, summary1.Description, x.Projects[summary1.ProjectID].Description)
-	assert.Equal(t, summary1.Plugins, x.Projects[summary1.ProjectID].Plugins)
+	assert.Equal(t, "Fred Flintstone", x.DisplayName)
 }
 
 func TestClient_ReadProject(t *testing.T) {
