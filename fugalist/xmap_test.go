@@ -6,24 +6,22 @@ import (
 )
 
 var lenAxis = Axis{
-	Id:    "abc",
-	Name:  "Length",
-	AddOn: false,
+	Id:   "abc",
+	Name: "Length",
 	Techniques: []Technique{
-		{"abc2", "Normal", "ks1"},
-		{"abc1", "Staccato", "ks2"},
-		{"abc3", "Tenuto", "ks3"},
+		{"abc2", "Normal"},
+		{"abc1", "Staccato"},
+		{"abc3", "Tenuto"},
 	},
 }
 
 var techAxis = Axis{
-	Id:    "Tech",
-	Name:  "Techniques",
-	AddOn: false,
+	Id:   "Tech",
+	Name: "Techniques",
 	Techniques: []Technique{
-		{"Tech1", "Normal", "ks12"},
-		{"Tech2", "Pizzicato", "ks13"},
-		{"Tech3", "Flautando", "ks14"},
+		{"Tech1", "Normal"},
+		{"Tech2", "Pizzicato"},
+		{"Tech3", "Flautando"},
 	},
 }
 
@@ -36,8 +34,8 @@ func TestGetCombo(t *testing.T) {
 
 func Test(t *testing.T) {
 	tests := []struct {
-		name string
-		ind int
+		name     string
+		ind      int
 		expected string
 	}{
 		{"0", 0, ""},
@@ -59,4 +57,3 @@ func Test(t *testing.T) {
 		})
 	}
 }
-

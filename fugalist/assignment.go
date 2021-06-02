@@ -29,9 +29,6 @@ func GetTechniqueIds(axes []Axis, k int) []TechniqueId {
 	result := make([]TechniqueId, len(axes))
 	for a := len(axes) - 1; a >= 0; a-- {
 		axis := axes[a]
-		if axis.AddOn {
-			continue
-		}
 		ind := k % len(axis.Techniques)
 		k = k / len(axis.Techniques)
 		result[a] = axis.Techniques[ind].Id

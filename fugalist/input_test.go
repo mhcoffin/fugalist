@@ -203,9 +203,9 @@ func TestInput_MustBeConstant(t *testing.T) {
 
 func TestInput_MustBeConjunction(t *testing.T) {
 	tests := []struct {
-		name string
+		name     string
 		expected Conjunction
-		ok bool
+		ok       bool
 	}{
 		{"and", And, true},
 		{" &", And, true},
@@ -217,7 +217,6 @@ func TestInput_MustBeConjunction(t *testing.T) {
 		{" | NL < short", Or, true},
 		{" || NL < short", Or, true},
 		{" orlon NL < short", NoConjunction, false},
-
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

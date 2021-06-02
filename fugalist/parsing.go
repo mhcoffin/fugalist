@@ -26,7 +26,7 @@ func ParseSwitchOffActionList(s string, middleC string) (*doricolib.SwitchOffAct
 		return nil, fmt.Errorf("failed to parse stop-action list: %w", err)
 	}
 	return &doricolib.SwitchOffActionList{
-		IsArray:         "true",
+		IsArray:          "true",
 		SwitchOffActions: actions,
 	}, nil
 }
@@ -34,9 +34,12 @@ func ParseSwitchOffActionList(s string, middleC string) (*doricolib.SwitchOffAct
 func ParseActionList(s string, middleC string) ([]doricolib.SwitchAction, error) {
 	c := 4
 	switch middleC {
-	case "C3", "c3": c = 3
-	case "C4", "c4": c = 4
-	case "C5", "c5": c = 5
+	case "C3", "c3":
+		c = 3
+	case "C4", "c4":
+		c = 4
+	case "C5", "c5":
+		c = 5
 	}
 	parts := strings.Split(s, ",")
 	actions := make([]doricolib.SwitchAction, 0)
@@ -84,7 +87,7 @@ func ParseMidi(part string, middleCOctave int) (*doricolib.SwitchAction, error) 
 			return nil, fmt.Errorf("bad CC")
 		}
 		return &doricolib.SwitchAction{
-			Type: "kControlChange",
+			Type:   "kControlChange",
 			Param1: x[1],
 			Param2: setting,
 		}, nil
@@ -118,7 +121,6 @@ func ParseMidi(part string, middleCOctave int) (*doricolib.SwitchAction, error) 
 			Param2: "127",
 		}, nil
 
-
 	default:
 		return nil, fmt.Errorf("illegal midi setting: \"%v\"", part)
 	}
@@ -137,7 +139,7 @@ func proportion(num string, den string) (string, error) {
 		return "", fmt.Errorf("fraction is not proper: %d/%d", int(n), int(d))
 	}
 	interval := (n * 128) / d
-	point := (n-1) * interval + (interval / 2)
+	point := (n-1)*interval + (interval / 2)
 	return fmt.Sprintf("%d", int(point)), nil
 
 }
@@ -158,7 +160,7 @@ func note(name, sharpOrFlat, octave string, middleCOctave int) (int, error) {
 	if err != nil {
 		return -1, err
 	}
-	return 60 + (oct - middleCOctave) * 12 + noteNumber, nil
+	return 60 + (oct-middleCOctave)*12 + noteNumber, nil
 }
 
 func noteNumber(noteName string) (int, error) {

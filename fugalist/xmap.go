@@ -74,7 +74,7 @@ func CreateCombos(p *Project) ([]*doricolib.PlayingTechniqueCombination, error) 
 		}
 		soundId := p.Assignments[key].Sound
 
-		pigment, isPigment := p.Pigments[soundId]
+		pigment, isPigment := p.VstSounds[soundId]
 		if isPigment {
 			combo, err := CreateComboForPigment(techniques, pigment, p.MiddleC)
 			if err != nil {
@@ -82,7 +82,7 @@ func CreateCombos(p *Project) ([]*doricolib.PlayingTechniqueCombination, error) 
 			}
 			r = append(r, combo)
 		} else {
-			color, isColor := p.Palette[soundId]
+			color, isColor := p.CompositeSounds[soundId]
 			if !isColor {
 				return nil, fmt.Errorf("no sound for %s (key %s)", techniques, key)
 			}
@@ -96,7 +96,7 @@ func CreateCombos(p *Project) ([]*doricolib.PlayingTechniqueCombination, error) 
 	return r, nil
 }
 
-func CreateComboForPigment(techniques string, pigment *Pigment, middleC string) (*doricolib.PlayingTechniqueCombination, error) {
+func CreateComboForPigment(techniques string, pigment *VstSound, middleC string) (*doricolib.PlayingTechniqueCombination, error) {
 	volSpec, volRange, err := ParseVolumeSpec(pigment.Dynamics)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse dynamics: %w", err)
@@ -127,12 +127,12 @@ func CreateComboForPigment(techniques string, pigment *Pigment, middleC string) 
 	return combo, nil
 }
 
-func CreateCombosForColor(techniques string, color *Color, p *Project, middleC string) ([]*doricolib.PlayingTechniqueCombination, error) {
+func CreateCombosForColor(techniques string, color *CompositeSound, p *Project, middleC string) ([]*doricolib.PlayingTechniqueCombination, error) {
 	combos := make([]*doricolib.PlayingTechniqueCombination, len(color.Branches))
 
 	k := 0
 	for _, branch := range color.Branches {
-		pigment, isPigment := p.Pigments[branch.Pigment]
+		pigment, isPigment := p.VstSounds[branch.VstSoundId]
 		if !isPigment {
 			return nil, fmt.Errorf("no such pigment")
 		}
@@ -151,7 +151,7 @@ func CreateCombosForColor(techniques string, color *Color, p *Project, middleC s
 			combo.Flags = 0
 		} else {
 			combo.Flags = 1
-			combo.LengthFactor = fmt.Sprintf("%f", branch.Length / 100.0)
+			combo.LengthFactor = fmt.Sprintf("%f", branch.Length/100.0)
 		}
 
 		// Transpose
@@ -182,9 +182,6 @@ func GetCombo(axes []Axis, k int) (string, error) {
 	result := make([]string, 0)
 	for a := len(axes) - 1; a >= 0; a-- {
 		axis := axes[a]
-		if axis.AddOn {
-			continue
-		}
 		ind := k % len(axis.Techniques)
 		k = k / len(axis.Techniques)
 		if ind == 0 {
@@ -215,9 +212,7 @@ func GetComboKey(axes []Axis, k int) string {
 func GetSize(axes []Axis) int {
 	r := 1
 	for _, axis := range axes {
-		if !axis.AddOn {
-			r *= len(axis.Techniques)
-		}
+		r *= len(axis.Techniques)
 	}
 	return r
 }
@@ -291,4 +286,3 @@ func CreateTechniqueAddOn(modifier Tint, middleC string) (*doricolib.TechniqueAd
 		SwitchOffActions: *stop,
 	}, nil
 }
-

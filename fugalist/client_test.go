@@ -35,15 +35,15 @@ var (
 		},
 		SortOrder: 200,
 	}
-	pigment1 = &Pigment{
-		PigmentId: Uniq(),
+	vstSound1 = &VstSound{
+		Id: Uniq(),
 		Name:      "sus",
 		Midi:      "c#1,d2",
 		Stop:      "c1",
 		Dynamics:  "cc3",
 	}
-	pigment2 = &Pigment{
-		PigmentId: Uniq(),
+	vstSound2 = &VstSound{
+		Id: Uniq(),
 		Name:      "short",
 		Midi:      "c#1,d3",
 		Stop:      "c1",
@@ -59,24 +59,22 @@ var (
 	}
 	project1 = Project{
 		ProjectId:  pid,
-		Public:     false,
 		CreateTime: createTime,
 		ModifyTime: modifyTime,
 		Axes: map[string]Axis{
 			axis1.Id: axis1,
 			axis2.Id: axis2,
 		},
-		Pigments: map[PigmentId]*Pigment{
-			pigment1.PigmentId: pigment1,
-			pigment2.PigmentId: pigment2,
+		VstSounds: map[VstSoundId]*VstSound{
+			vstSound1.Id: vstSound1,
+			vstSound2.Id: vstSound2,
 		},
-		Palette:      nil,
+		CompositeSounds:      nil,
 		Tints:        nil,
 		Assignments:  nil,
-		URL:          nil,
-		URLTimestamp: nil,
 		MiddleC:      "",
 	}
+
 )
 
 func init() {
@@ -101,6 +99,10 @@ func SetUp() string {
 	if err != nil {
 		panic(err)
 	}
+	err = CreateSummaries(uid, summary1)
+	if err != nil {
+		panic(err)
+	}
 	return uid
 }
 
@@ -111,11 +113,11 @@ func CreateUser(uid string, summaries ...ProjectSummary) error {
 	}
 	user := UserInfo{
 		CanonicalDisplayName: "fredflintstone",
-		CreationTime: time.Time{},
-		DisplayName: "Fred Flintstone",
-		Email: "fred@bedrock.com",
-		PhotoURL: "https://foo/bar",
-		Theme: "dark",
+		CreationTime:         time.Time{},
+		DisplayName:          "Fred Flintstone",
+		Email:                "fred@bedrock.com",
+		PhotoURL:             "https://foo/bar",
+		Theme:                "dark",
 	}
 	_, err := firestoreClient.Collection("Users").Doc(uid).Create(ctx, user)
 	return err
@@ -126,6 +128,16 @@ func CreateProjects(uid string, projects ...Project) error {
 		_, err := firestoreClient.Collection("Users").Doc(uid).Collection("Projects").Doc(p.ProjectId).Create(ctx, project1)
 		if err != nil {
 			return fmt.Errorf("failed to save project: %w", err)
+		}
+	}
+	return nil
+}
+
+func CreateSummaries(uid string, summaries ...ProjectSummary) error {
+	for _, p := range summaries {
+		_, err := firestoreClient.Collection("Users").Doc(uid).Collection("Summaries").Doc(p.ProjectID).Create(ctx, summary1)
+		if err != nil {
+			return fmt.Errorf("failed to save project summary: %w", err)
 		}
 	}
 	return nil
@@ -153,9 +165,8 @@ func TestClient_ReadProject(t *testing.T) {
 	assert.Equal(t, project1.Axes, p.Axes)
 	assert.Equal(t, project1.Assignments, p.Assignments)
 	assert.Equal(t, project1.MiddleC, p.MiddleC)
-	assert.Equal(t, project1.Palette, p.Palette)
-	assert.Equal(t, project1.Pigments, p.Pigments)
-	assert.Equal(t, project1.URL, p.URL)
+	assert.Equal(t, project1.CompositeSounds, p.CompositeSounds)
+	assert.Equal(t, project1.VstSounds, p.VstSounds)
 }
 
 func TestClient_SetUrl(t *testing.T) {
@@ -166,9 +177,9 @@ func TestClient_SetUrl(t *testing.T) {
 	url := "http://foo/bar"
 	err = cl.SetUrl(ctx, pid, url)
 	assert.Nil(t, err)
-	p, err := cl.ReadProject(ctx, pid)
+	p, err := cl.ReadProjectSummary(ctx, pid)
 	assert.Nil(t, err)
-	assert.Equal(t, &url, p.URL)
-	assert.WithinDuration(t, time.Now(), *p.URLTimestamp, 200 * time.Millisecond)
+	assert.Equal(t, url, p.ExpressionMapURL)
+	assert.WithinDuration(t, time.Now(), p.ExpressionMapTime, 200*time.Millisecond)
 
 }

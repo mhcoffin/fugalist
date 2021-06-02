@@ -5,7 +5,6 @@ import (
 	"strings"
 )
 
-
 type Clause struct {
 	operator ComparisonOperator
 	lhs      Variable

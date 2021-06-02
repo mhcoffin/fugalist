@@ -77,7 +77,7 @@ func TestInput_ParseCondition(t *testing.T) {
 
 func TestCondition_String(t *testing.T) {
 	tests := []struct {
-		name string
+		name     string
 		expected string
 	}{
 		{"NoteLength < short", "NoteLength &LT; kShort"},
@@ -93,4 +93,3 @@ func TestCondition_String(t *testing.T) {
 		})
 	}
 }
-

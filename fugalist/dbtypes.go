@@ -6,31 +6,31 @@ import (
 
 type PaletteSoundId = string
 
-type SoundId = string
-
-type PigmentId = string
-type Pigment struct {
-	PigmentId string `firestore:"Id"`
-	Name      string `firestore:"name"`
-	Midi      string `firestore:"midi"`
-	Stop      string `firestore:"stop"`
-	Dynamics  string `firestore:"dyn"`
+type VstSoundId = string
+type VstSound struct {
+	Id       VstSoundId `firestore:"Id"`
+	Name     string     `firestore:"name"`
+	Midi     string     `firestore:"midi"`
+	Stop     string     `firestore:"stop"`
+	Dynamics string     `firestore:"dyn"`
 }
 
 type BranchId = string
 type Branch struct {
-	Id        BranchId
-	Condition string
-	Length    float64
-	Order     float32
-	Transpose float64
-	Pigment   string
+	Id         BranchId
+	Order      float64
+	Condition  string
+	VstSoundId string
+	Length     float64
+	Transpose  float64
 }
 
-type ColorId = string
-type Color struct {
-	ColorId  string
+type CompositeSoundId = string
+type CompositeSound struct {
+	Id       CompositeSoundId
+	Name     string
 	Branches map[BranchId]Branch
+	Order    float64
 }
 
 type TechniqueId = string
@@ -38,7 +38,6 @@ type TechniqueId = string
 type Technique struct {
 	Id   TechniqueId `firestore:"id"`
 	Name string      `firestore:"name"`
-	Midi string      `firestore:"midi"`
 }
 
 type AxisId = string
@@ -46,7 +45,6 @@ type AxisId = string
 type Axis struct {
 	Id         AxisId      `firestore:"id"`
 	Name       string      `firestore:"name"`
-	AddOn      bool        `firestore:"addOn"`
 	Techniques []Technique `firestore:"techniques"`
 	SortOrder  float64     `firestore:"sortOrder"`
 }
@@ -74,18 +72,15 @@ type Tint = struct {
 }
 
 type Project struct {
-	ProjectId    string
-	Public       bool
-	CreateTime   time.Time
-	ModifyTime   time.Time
-	Axes         map[string]Axis
-	Pigments     map[PigmentId]*Pigment
-	Palette      map[ColorId]*Color
-	Tints        map[string]*Tint
-	Assignments  map[string]Assignment
-	URL          *string
-	URLTimestamp *time.Time
-	MiddleC      string
+	ProjectId       string
+	CreateTime      time.Time
+	ModifyTime      time.Time
+	Axes            map[string]Axis
+	VstSounds       map[VstSoundId]*VstSound
+	Tints           map[string]*Tint
+	CompositeSounds map[CompositeSoundId]*CompositeSound
+	Assignments     map[string]Assignment
+	MiddleC         string
 }
 
 type AudioExample struct {
