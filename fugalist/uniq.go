@@ -6,8 +6,9 @@ import (
 	"time"
 )
 
-// Note: characters are chosen to not require URL encoding.
-const base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-"
+// Note: characters are chosen to not require URL encoding. These must match
+// what is used in the front-end.
+const base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-"
 const sixBits = 0b111111
 const sixtyBits = 0b111111111111111111111111111111111111111111111111111111111111
 

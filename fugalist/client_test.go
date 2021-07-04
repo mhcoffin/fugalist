@@ -36,18 +36,18 @@ var (
 		SortOrder: 200,
 	}
 	vstSound1 = &VstSound{
-		Id: Uniq(),
-		Name:      "sus",
-		Midi:      "c#1,d2",
-		Stop:      "c1",
-		Dynamics:  "cc3",
+		Id:       Uniq(),
+		Name:     "sus",
+		Midi:     "c#1,d2",
+		Stop:     "c1",
+		Dynamics: "cc3",
 	}
 	vstSound2 = &VstSound{
-		Id: Uniq(),
-		Name:      "short",
-		Midi:      "c#1,d3",
-		Stop:      "c1",
-		Dynamics:  "cc3",
+		Id:       Uniq(),
+		Name:     "short",
+		Midi:     "c#1,d3",
+		Stop:     "c1",
+		Dynamics: "cc3",
 	}
 	summary1 = ProjectSummary{
 		CreateTime:  createTime,
@@ -69,12 +69,11 @@ var (
 			vstSound1.Id: vstSound1,
 			vstSound2.Id: vstSound2,
 		},
-		CompositeSounds:      nil,
-		Tints:        nil,
-		Assignments:  nil,
-		MiddleC:      "",
+		CompositeSounds: nil,
+		Tints:           nil,
+		Assignments:     nil,
+		MiddleC:         "",
 	}
-
 )
 
 func init() {

@@ -62,7 +62,7 @@ func CreateCombos(p *Project) ([]*doricolib.PlayingTechniqueCombination, error) 
 	axes := SortedAxes(p.Axes)
 	size := GetSize(axes)
 	for k := 0; k < size; k++ {
-		techniques, err := GetCombo(axes, k)
+		techniques, err := GetCombinationString(axes, k)
 		if err != nil {
 			return nil, err
 		}
@@ -74,21 +74,21 @@ func CreateCombos(p *Project) ([]*doricolib.PlayingTechniqueCombination, error) 
 		}
 		soundId := p.Assignments[key].Sound
 
-		pigment, isPigment := p.VstSounds[soundId]
-		if isPigment {
-			combo, err := CreateComboForPigment(techniques, pigment, p.MiddleC)
+		vstSound, isVstSound := p.VstSounds[soundId]
+		if isVstSound {
+			combo, err := CreateComboForVstSound(techniques, vstSound, p.MiddleC)
 			if err != nil {
-				return nil, fmt.Errorf("failed to create combo for pigment: %w", err)
+				return nil, fmt.Errorf("failed to create combo for vst sound: %w", err)
 			}
 			r = append(r, combo)
 		} else {
-			color, isColor := p.CompositeSounds[soundId]
-			if !isColor {
+			compositeSound, isCompositeSound := p.CompositeSounds[soundId]
+			if !isCompositeSound {
 				return nil, fmt.Errorf("no sound for %s (key %s)", techniques, key)
 			}
-			combos, err := CreateCombosForColor(techniques, color, p, p.MiddleC)
+			combos, err := CreateCombosForCompositeSound(techniques, compositeSound, p, p.MiddleC)
 			if err != nil {
-				return nil, fmt.Errorf("failed to create combos for color: %w", err)
+				return nil, fmt.Errorf("failed to create combos for composite sound: %w", err)
 			}
 			r = append(r, combos...)
 		}
@@ -96,12 +96,12 @@ func CreateCombos(p *Project) ([]*doricolib.PlayingTechniqueCombination, error) 
 	return r, nil
 }
 
-func CreateComboForPigment(techniques string, pigment *VstSound, middleC string) (*doricolib.PlayingTechniqueCombination, error) {
-	volSpec, volRange, err := ParseVolumeSpec(pigment.Dynamics)
+func CreateComboForVstSound(techniques string, vstSound *VstSound, middleC string) (*doricolib.PlayingTechniqueCombination, error) {
+	volSpec, volRange, err := ParseVolumeSpec(vstSound.Dynamics)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse dynamics: %w", err)
 	}
-	switchOnActions, err := ParseSwitchOnActionList(pigment.Midi, middleC)
+	switchOnActions, err := ParseSwitchOnActionList(vstSound.Midi, middleC)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse switch-on actions: %w", err)
 	}
@@ -122,23 +122,23 @@ func CreateComboForPigment(techniques string, pigment *VstSound, middleC string)
 			Param1: "0",
 		},
 		SwitchOnActions:  *switchOnActions,
-		SwitchOffActions: doricolib.SwitchOffActionList{},
+		SwitchOffActions: doricolib.SwitchOffActionList{}, // TODO switch-off actions
 	}
 	return combo, nil
 }
 
-func CreateCombosForColor(techniques string, color *CompositeSound, p *Project, middleC string) ([]*doricolib.PlayingTechniqueCombination, error) {
-	combos := make([]*doricolib.PlayingTechniqueCombination, len(color.Branches))
+func CreateCombosForCompositeSound(techniques string, compositeSound *CompositeSound, p *Project, middleC string) ([]*doricolib.PlayingTechniqueCombination, error) {
+	combos := make([]*doricolib.PlayingTechniqueCombination, len(compositeSound.Branches))
 
 	k := 0
-	for _, branch := range color.Branches {
-		pigment, isPigment := p.VstSounds[branch.VstSoundId]
-		if !isPigment {
-			return nil, fmt.Errorf("no such pigment")
+	for _, branch := range compositeSound.Branches {
+		vstSound, isVstSound := p.VstSounds[branch.VstSoundId]
+		if !isVstSound {
+			return nil, fmt.Errorf("no such vstSound")
 		}
-		combo, err := CreateComboForPigment(techniques, pigment, middleC)
+		combo, err := CreateComboForVstSound(techniques, vstSound, middleC)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create combo for pigment: %w", err)
+			return nil, fmt.Errorf("failed to create combo for vstSound: %w", err)
 		}
 		cond, err := Input(branch.Condition).ParseCondition()
 		if err != nil {
@@ -178,17 +178,16 @@ func SortedAxes(axes map[string]Axis) []Axis {
 	return result
 }
 
-func GetCombo(axes []Axis, k int) (string, error) {
+func GetCombinationString(axes []Axis, k int) (string, error) {
 	result := make([]string, 0)
 	for a := len(axes) - 1; a >= 0; a-- {
 		axis := axes[a]
 		ind := k % len(axis.Techniques)
-		k = k / len(axis.Techniques)
-		if ind == 0 {
-			continue
+		if ind != 0 {
+			technique := doricolib.GetTechniqueByName(axis.Techniques[ind].Name).Id
+			result = append(result, technique)
 		}
-		technique := doricolib.GetTechniqueByName(axis.Techniques[ind].Name).Id
-		result = append(result, technique)
+		k = k / len(axis.Techniques)
 	}
 	if len(result) == 0 {
 		return "pt.natural", nil
