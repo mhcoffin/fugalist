@@ -25,20 +25,13 @@ var techAxis = Axis{
 	},
 }
 
-func TestGetCombo(t *testing.T) {
-	axes := []Axis{lenAxis, techAxis}
-	combo, err := GetCombo(axes, 0)
-	assert.Nil(t, err)
-	assert.Equal(t, combo, "")
-}
-
 func Test(t *testing.T) {
 	tests := []struct {
 		name     string
 		ind      int
 		expected string
 	}{
-		{"0", 0, ""},
+		{"0", 0, "pt.natural"},
 		{"1", 1, "pt.pizzicato"},
 		{"2", 2, "pt.flautando"},
 		{"3", 3, "pt.staccato"},
@@ -51,7 +44,7 @@ func Test(t *testing.T) {
 	axes := []Axis{lenAxis, techAxis}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			combo, err := GetCombo(axes, test.ind)
+			combo, err := GetCombinationString(axes, test.ind)
 			assert.Nil(t, err)
 			assert.Equal(t, test.expected, combo)
 		})
