@@ -178,14 +178,15 @@ func TestInput_MustBeConstant(t *testing.T) {
 		err  bool
 	}{
 		{"empty", "  ", NoConstant, true},
-		{"very short", " VeryShort ", VeryShort, false},
-		{"very short 2", " vs ", VeryShort, false},
+		{"VeryShort", " VeryShort ", VeryShort, false},
+		{"VeryShort2", " Very Short ", VeryShort, false},
+		{"VeryShort3", " very short ", VeryShort, false},
 		{"short", " short ", Short, false},
-		{"short 2", " s ", Short, false},
 		{"medium", " medium ", Medium, false},
-		{"medium 2", " m ", Medium, false},
 		{"long", "Long", Long, false},
-		{"long 2", "  l foo", Long, false},
+		{"VeryLong", " very  long", VeryLong, false},
+		{"VeryLong2", "veryLong", VeryLong, false},
+		{"VeryLong3", "VeryLong", VeryLong, false},
 		{"no", "xyz", NoConstant, true},
 	}
 	for _, test := range tests {
@@ -209,13 +210,13 @@ func TestInput_MustBeConjunction(t *testing.T) {
 	}{
 		{"and", And, true},
 		{" &", And, true},
-		{" && NL < short", And, true},
+		{" && NL < very short", And, true},
 		{" AND NL < short", And, true},
 		{" ANDOVER NL < short", NoConjunction, false},
 		{" or NL < short", Or, true},
 		{" Or NL < short", Or, true},
-		{" | NL < short", Or, true},
-		{" || NL < short", Or, true},
+		{" | NL < long", Or, true},
+		{" || NL < very long", Or, true},
 		{" orlon NL < short", NoConjunction, false},
 	}
 	for _, test := range tests {

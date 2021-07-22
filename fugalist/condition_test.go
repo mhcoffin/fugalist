@@ -16,7 +16,7 @@ func TestClause(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			_, clause, err := ParseClause(Input(test.name))
+			_, clause, err := Input(test.name).ParseClause()
 			if test.err {
 				assert.NotNil(t, err)
 			} else {
@@ -90,6 +90,70 @@ func TestCondition_String(t *testing.T) {
 			cond, err := Input(test.name).ParseCondition()
 			assert.Nil(t, err)
 			assert.Equal(t, test.expected, cond.String())
+		})
+	}
+}
+
+func TestRange(t *testing.T) {
+	tests := []struct {
+		name     string
+		expected Condition
+	}{
+		{
+			"short < NoteLength < long", Condition{
+				connector: And,
+				clauses: []Clause{
+					{
+						operator: GT,
+						lhs:      "NoteLength",
+						rhs:      "short",
+					},
+					{
+						operator: LT,
+						lhs:      "NoteLength",
+						rhs:      "long",
+					},
+				},
+			},
+		},
+		{
+			"veryShort <= NoteLength <= veryLong", Condition{
+				connector: And,
+				clauses: []Clause{
+					{
+						operator: GE,
+						lhs:      "NoteLength",
+						rhs:      "veryShort",
+					},
+					{
+						operator: LE,
+						lhs:      "NoteLength",
+						rhs:      "veryLong",
+					},
+				},
+			},
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			cond, err := Input(test.name).ParseRange()
+			assert.Nil(t, err)
+			assert.Equal(t, test.expected, cond)
+		})
+	}
+}
+
+func TestRange_Failure(t *testing.T) {
+	tests := []struct {
+		name string
+	}{
+		{"veryShort >= veryLong"},
+		{"veryShort <= NoteLength > long"},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			_, err := Input(test.name).ParseRange()
+			assert.NotNil(t, err)
 		})
 	}
 }

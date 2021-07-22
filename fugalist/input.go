@@ -22,17 +22,17 @@ const (
 func (com ComparisonOperator) String() string {
 	switch com {
 	case LT:
-		return "<"
+		return "&LT;"
 	case LE:
-		return "<="
+		return "&LT;="
 	case EQ:
 		return "=="
 	case NE:
 		return "!="
 	case GT:
-		return ">"
+		return "&GT;"
 	case GE:
-		return ">="
+		return "&GT;="
 	default:
 		panic("no such comparison operator")
 	}
@@ -179,28 +179,44 @@ func (in Input) MustBeIdentifier() (Input, string, error) {
 	return rest, id, err
 }
 
+var noteLengthRegexp = regexp.MustCompile(`(?i)(note\s*length)|(nl)`)
+
 func (in Input) MustBeVariable() (Input, Variable, error) {
-	rest, id, err := in.MustBeIdentifier()
+	rest, _, err := in.MustBe(noteLengthRegexp)
 	if err != nil {
 		return in, NoVariable, fmt.Errorf("variable name expected: %w", err)
 	}
-	v := VariableMap[strings.ToLower(id)]
-	if v == "" {
-		return in, NoVariable, fmt.Errorf("unrecognized variable: %s", id)
-	}
-	return rest, v, nil
+	return rest, "NoteLength", nil
 }
 
+var veryShortRegexp = regexp.MustCompile(`^(?i)(very\s*short)`)
+var shortRegexp = regexp.MustCompile(`^(?i)short`)
+var mediumRegexp = regexp.MustCompile(`^(?i)medium`)
+var longRegexp = regexp.MustCompile(`^(?i)long`)
+var veryLongRegexp = regexp.MustCompile(`^(?i)very\s*long`)
+
 func (in Input) MustBeConstant() (Input, Constant, error) {
-	rest, id, err := in.MustBeIdentifier()
-	if err != nil {
-		return in, NoConstant, fmt.Errorf("constant expected: %w", err)
+	rest, _, err := in.MustBe(veryShortRegexp)
+	if err == nil {
+		return rest, "veryShort", nil
 	}
-	c := ConstantMap[strings.ToLower(id)]
-	if c == "" {
-		return in, NoConstant, fmt.Errorf("unknown constant: %s", id)
+	rest, _, err = in.MustBe(shortRegexp)
+	if err == nil {
+		return rest, "short", nil
 	}
-	return rest, c, nil
+	rest, _, err = in.MustBe(mediumRegexp)
+	if err == nil {
+		return rest, "medium", nil
+	}
+	rest, _, err = in.MustBe(longRegexp)
+	if err == nil {
+		return rest, "long", nil
+	}
+	rest, _, err = in.MustBe(veryLongRegexp)
+	if err == nil {
+		return rest, "veryLong", nil
+	}
+	return rest, "?", fmt.Errorf("expected constant")
 }
 
 func (in Input) MustBeComparisonOperator() (Input, ComparisonOperator, error) {
