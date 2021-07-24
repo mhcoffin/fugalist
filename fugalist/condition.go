@@ -31,15 +31,15 @@ func (cond *Condition) String() string {
 }
 
 func (in Input) ParseBranch() (Condition, error) {
-	cond, err := in.ParseCondition()
+	cond, err := in.ParseRange()
 	if err == nil {
 		return cond, nil
 	}
-	cond, err = in.ParseRange()
+	cond, err = in.ParseClauseList()
 	return cond, err
 }
 
-func (in Input) ParseCondition() (Condition, error) {
+func (in Input) ParseClauseList() (Condition, error) {
 	connector := NoConjunction
 	clauses := make([]Clause, 0)
 	var rest = in
@@ -66,29 +66,55 @@ func (in Input) ParseCondition() (Condition, error) {
 	return Condition{connector, clauses}, nil
 }
 
-func (in Input) ParseClause() (Input, Clause, error) {
+func (in Input) ParseComparisonNoteLengthFirst() (Input, Clause, error) {
 	var rest = in
-	var lhs Variable
-	var op ComparisonOperator
-	var rhs Constant
+	var result = Clause{}
 	var err error
-	rest, lhs, err = rest.MustBeVariable()
+	rest, result.lhs, err = rest.MustBeVariable()
 	if err != nil {
 		return in, Clause{}, fmt.Errorf("identifier expected")
 	}
-	rest, op, err = rest.MustBeComparisonOperator()
+	rest, result.operator, err = rest.MustBeComparisonOperator()
 	if err != nil {
 		return in, Clause{}, fmt.Errorf("comparison operator expected")
 	}
-	rest, rhs, err = rest.MustBeConstant()
+	rest, result.rhs, err = rest.MustBeConstant()
 	if err != nil {
 		return in, Clause{}, fmt.Errorf("constant expected")
 	}
-	return rest, Clause{
-		operator: op,
-		lhs:      lhs,
-		rhs:      rhs,
-	}, nil
+	return rest, result, nil
+}
+
+func (in Input) ParseComparisonLengthConstantFirst() (Input, Clause, error) {
+	var rest = in
+	var result = Clause{}
+	var err error
+	rest, result.rhs, err = rest.MustBeConstant()
+	if err != nil {
+		return in, Clause{}, fmt.Errorf("identifier expected")
+	}
+	rest, result.operator, err = rest.MustBeComparisonOperator()
+	if err != nil {
+		return in, Clause{}, fmt.Errorf("comparison operator expected")
+	}
+	result.operator = result.operator.Opposite()
+	rest, result.lhs, err = rest.MustBeVariable()
+	if err != nil {
+		return in, Clause{}, fmt.Errorf("constant expected")
+	}
+	return rest, result, nil
+}
+
+func (in Input) ParseClause() (Input, Clause, error) {
+	rest, result, err := in.ParseComparisonNoteLengthFirst()
+	if err == nil {
+		return rest, result, err
+	}
+	rest, result, err = in.ParseComparisonLengthConstantFirst()
+	if err == nil {
+		return rest, result, err
+	}
+	return in, Clause{}, fmt.Errorf("clause expected")
 }
 
 func (in Input) ParseRange() (Condition, error) {

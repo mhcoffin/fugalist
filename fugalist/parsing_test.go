@@ -88,10 +88,10 @@ func TestCcPattern(t *testing.T) {
 		{"CC without range", "CC7", []string{"7", "", ""}},
 		{"CC with spaces", "  CC 7   ", []string{"7", "", ""}},
 		{"CC with spaces", "  CC 77   ", []string{"77", "", ""}},
-		{"CC with range", "CC3 0-127", []string{"3", "0", "127"}},
-		{"CC with range", "CC3 0-127", []string{"3", "0", "127"}},
-		{"CC with range and space", " CC 3 0 - 127 ", []string{"3", "0", "127"}},
-		{"lower case", " cc 3 0 - 127 ", []string{"3", "0", "127"}},
+		{"CC with range", "CC3 0:127", []string{"3", "0", "127"}},
+		{"CC with range", "CC3 0:127", []string{"3", "0", "127"}},
+		{"CC with range and space", " CC 3 0:127 ", []string{"3", "0", "127"}},
+		{"lower case", " cc 3 0 : 127 ", []string{"3", "0", "127"}},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -107,9 +107,9 @@ func TestVelPattern(t *testing.T) {
 		input    string
 		expected []string
 	}{
-		{"Vel without range", "VEL", []string{"", ""}},
-		{"Vel lower case", "vel", []string{"", ""}},
-		{"Vel with range", "Vel 10-90", []string{"10", "90"}},
+		{"Vel without range", "Velocity", []string{"", ""}},
+		{"Vel lower case", "velocity", []string{"", ""}},
+		{"Vel with range", "velocity 10:90", []string{"10", "90"}},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -127,9 +127,9 @@ func TestParseVolumeSpec(t *testing.T) {
 		expectedRange   string
 	}{
 		{"CC", "cc3", &doricolib.VolumeType{Type: "kCC", Param1: "3"}, "0,127"},
-		{"CC", "cc3 10-100", &doricolib.VolumeType{Type: "kCC", Param1: "3"}, "10,100"},
-		{"Vel", "vel", &doricolib.VolumeType{Type: "kNoteVelocity", Param1: "0"}, "0,127"},
-		{"Vel", "vel 11-33", &doricolib.VolumeType{Type: "kNoteVelocity", Param1: "0"}, "11,33"},
+		{"CC with range", "cc3 10:100", &doricolib.VolumeType{Type: "kCC", Param1: "3"}, "10,100"},
+		{"Velocity", "velocity", &doricolib.VolumeType{Type: "kNoteVelocity", Param1: "0"}, "0,127"},
+		{"Velocity with range", "velocity 11:33", &doricolib.VolumeType{Type: "kNoteVelocity", Param1: "0"}, "11,33"},
 	}
 
 	for _, test := range tests {

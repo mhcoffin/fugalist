@@ -13,6 +13,8 @@ func TestClause(t *testing.T) {
 	}{
 		{"NoteLength < long", false, Clause{operator: LT, lhs: NoteLength, rhs: Long}},
 		{"nl == short", false, Clause{operator: EQ, lhs: NoteLength, rhs: Short}},
+		{"short < note length", false, Clause{operator: GT, lhs: NoteLength, rhs: Short}},
+		{"note length < long", false, Clause{operator: LT, lhs: NoteLength, rhs: Long}},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -36,7 +38,7 @@ func TestInput_ParseCondition(t *testing.T) {
 	}{
 		{"nl < short", Condition{connector: NoConjunction, clauses: []Clause{{operator: LT, lhs: NoteLength, rhs: Short}}}, true},
 		{"NoteLength < short", Condition{connector: NoConjunction, clauses: []Clause{{operator: LT, lhs: NoteLength, rhs: Short}}}, true},
-		{"nl < long and nl >= VeryShort",
+		{"nl < long && nl >= VeryShort",
 			Condition{
 				connector: And,
 				clauses: []Clause{
@@ -45,19 +47,9 @@ func TestInput_ParseCondition(t *testing.T) {
 				}},
 			true,
 		},
-		{"nl < long and nl >= VeryShort and nl != m",
+		{"nl < long && nl >= VeryShort && nl != medium",
 			Condition{
 				connector: And,
-				clauses: []Clause{
-					{operator: LT, lhs: NoteLength, rhs: Long},
-					{operator: GE, lhs: NoteLength, rhs: VeryShort},
-					{operator: NE, lhs: NoteLength, rhs: Medium},
-				}},
-			true,
-		},
-		{"nl < long || nl >= VeryShort || nl != m",
-			Condition{
-				connector: Or,
 				clauses: []Clause{
 					{operator: LT, lhs: NoteLength, rhs: Long},
 					{operator: GE, lhs: NoteLength, rhs: VeryShort},
@@ -68,26 +60,26 @@ func TestInput_ParseCondition(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			cond, err := Input(test.name).ParseCondition()
+			cond, err := Input(test.name).ParseClauseList()
 			assert.Equalf(t, test.ok, err == nil, "%s", err)
 			assert.Equal(t, test.expected, cond)
 		})
 	}
 }
 
-func TestCondition_String(t *testing.T) {
+func TestClauseList_String(t *testing.T) {
 	tests := []struct {
 		name     string
 		expected string
 	}{
-		{"NoteLength < short", "NoteLength &LT; kShort"},
-		{"nl < s", "NoteLength &LT; kShort"},
-		{"nl > s & nl <= vl", "NoteLength &GT; kShort AND NoteLength &LT;= kVeryLong"},
-		{"nl == s | nl == vs", "NoteLength == kShort OR NoteLength == kVeryShort"},
+		{"NoteLength < short", "NoteLength < kShort"},
+		{"nl < short", "NoteLength < kShort"},
+		{"nl > short && nl <= veryLong", "NoteLength > kShort && NoteLength <= kVeryLong"},
+		{"nl == Short && nl == very short", "NoteLength == kShort && NoteLength == kVeryShort"},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			cond, err := Input(test.name).ParseCondition()
+			cond, err := Input(test.name).ParseClauseList()
 			assert.Nil(t, err)
 			assert.Equal(t, test.expected, cond.String())
 		})
@@ -154,6 +146,27 @@ func TestRange_Failure(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			_, err := Input(test.name).ParseRange()
 			assert.NotNil(t, err)
+		})
+	}
+}
+
+func TestInput_ParseBranch(t *testing.T) {
+	tests := []struct {
+		name     string
+		expected string
+	}{
+		{" very short < NoteLength ", "NoteLength > kVeryShort"},
+		{"short < note length < long", "NoteLength > kShort && NoteLength < kLong"},
+		{"short < note length && note length < long", "NoteLength > kShort && NoteLength < kLong"},
+		{" very   short < note length && note length < veryLong ", "NoteLength > kVeryShort && NoteLength < kVeryLong"},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			t.Run(test.name, func(t *testing.T) {
+				b, err := Input(test.name).ParseBranch()
+				assert.Nil(t, err)
+				assert.Equal(t, test.expected, b.String())
+			})
 		})
 	}
 }

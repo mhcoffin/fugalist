@@ -22,17 +22,36 @@ const (
 func (com ComparisonOperator) String() string {
 	switch com {
 	case LT:
-		return "&LT;"
+		return "<"
 	case LE:
-		return "&LT;="
+		return "<="
 	case EQ:
 		return "=="
 	case NE:
 		return "!="
 	case GT:
-		return "&GT;"
+		return ">"
 	case GE:
-		return "&GT;="
+		return ">="
+	default:
+		panic("no such comparison operator")
+	}
+}
+
+func (com ComparisonOperator) Opposite() ComparisonOperator {
+	switch com {
+	case LT:
+		return GT
+	case LE:
+		return GE
+	case EQ:
+		return EQ
+	case NE:
+		return NE
+	case GT:
+		return LT
+	case GE:
+		return GT
 	default:
 		panic("no such comparison operator")
 	}
@@ -76,19 +95,6 @@ func (con Constant) String() string {
 	}
 }
 
-var ConstantMap = map[string]Constant{
-	"veryshort": VeryShort,
-	"vs":        VeryShort,
-	"short":     Short,
-	"s":         Short,
-	"medium":    Medium,
-	"m":         Medium,
-	"long":      Long,
-	"l":         Long,
-	"verylong":  VeryLong,
-	"vl":        VeryLong,
-}
-
 type Variable string
 
 const (
@@ -105,11 +111,6 @@ func (v Variable) String() string {
 	}
 }
 
-var VariableMap = map[string]Variable{
-	"notelength": NoteLength,
-	"nl":         NoteLength,
-}
-
 type Conjunction int
 
 const (
@@ -121,7 +122,7 @@ const (
 func (c Conjunction) String() string {
 	switch c {
 	case And:
-		return "AND"
+		return "&&"
 	case Or:
 		return "OR"
 	case NoConjunction:
@@ -230,7 +231,7 @@ func (in Input) MustBeComparisonOperator() (Input, ComparisonOperator, error) {
 }
 
 func (in Input) MustBeConjunction() (Input, Conjunction, error) {
-	r := regexp.MustCompile(`^(?i:and\b)|(?i:or\b)|&|&&|(\|)|(\|\|)`)
+	r := regexp.MustCompile(`^&&`)
 	r.Longest()
 
 	rest, op, err := in.MustBe(r)

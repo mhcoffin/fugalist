@@ -140,7 +140,7 @@ func CreateCombosForCompositeSound(techniques string, compositeSound *CompositeS
 		if err != nil {
 			return nil, fmt.Errorf("failed to create combo for vstSound: %w", err)
 		}
-		cond, err := Input(branch.Condition).ParseCondition()
+		cond, err := Input(branch.Condition).ParseClauseList()
 		if err != nil {
 			return nil, fmt.Errorf(`failed to parse condition: "%s"`, branch.Condition)
 		}
