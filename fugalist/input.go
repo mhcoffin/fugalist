@@ -3,7 +3,6 @@ package fugalist
 import (
 	"fmt"
 	"regexp"
-	"strings"
 	"unicode"
 )
 
@@ -116,29 +115,10 @@ type Conjunction int
 const (
 	NoConjunction Conjunction = iota
 	And
-	Or
 )
 
-func (c Conjunction) String() string {
-	switch c {
-	case And:
-		return "&&"
-	case Or:
-		return "OR"
-	case NoConjunction:
-		return ""
-	default:
-		panic("no such conjunction")
-	}
-}
-
-var ConjunctionMap = map[string]Conjunction{
-	"and": And,
-	"&":   And,
-	"&&":  And,
-	"or":  Or,
-	"|":   Or,
-	"||":  Or,
+func (conj Conjunction) String() string {
+	return "AND"
 }
 
 type Input string
@@ -231,12 +211,12 @@ func (in Input) MustBeComparisonOperator() (Input, ComparisonOperator, error) {
 }
 
 func (in Input) MustBeConjunction() (Input, Conjunction, error) {
-	r := regexp.MustCompile(`^&&`)
+	r := regexp.MustCompile(`(?i)^(and)`)
 	r.Longest()
 
-	rest, op, err := in.MustBe(r)
+	rest, _, err := in.MustBe(r)
 	if err != nil {
 		return in, NoConjunction, err
 	}
-	return rest, ConjunctionMap[strings.ToLower(op)], nil
+	return rest, And, nil
 }

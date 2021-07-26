@@ -36,9 +36,9 @@ func TestInput_ParseCondition(t *testing.T) {
 		expected Condition
 		ok       bool
 	}{
-		{"nl < short", Condition{connector: NoConjunction, clauses: []Clause{{operator: LT, lhs: NoteLength, rhs: Short}}}, true},
-		{"NoteLength < short", Condition{connector: NoConjunction, clauses: []Clause{{operator: LT, lhs: NoteLength, rhs: Short}}}, true},
-		{"nl < long && nl >= VeryShort",
+		{"nl < short", Condition{connector: And, clauses: []Clause{{operator: LT, lhs: NoteLength, rhs: Short}}}, true},
+		{"NoteLength < short", Condition{connector: And, clauses: []Clause{{operator: LT, lhs: NoteLength, rhs: Short}}}, true},
+		{"nl < long and nl >= VeryShort",
 			Condition{
 				connector: And,
 				clauses: []Clause{
@@ -47,7 +47,7 @@ func TestInput_ParseCondition(t *testing.T) {
 				}},
 			true,
 		},
-		{"nl < long && nl >= VeryShort && nl != medium",
+		{"nl < long AND nl >= VeryShort AND nl != medium",
 			Condition{
 				connector: And,
 				clauses: []Clause{
@@ -74,8 +74,8 @@ func TestClauseList_String(t *testing.T) {
 	}{
 		{"NoteLength < short", "NoteLength < kShort"},
 		{"nl < short", "NoteLength < kShort"},
-		{"nl > short && nl <= veryLong", "NoteLength > kShort && NoteLength <= kVeryLong"},
-		{"nl == Short && nl == very short", "NoteLength == kShort && NoteLength == kVeryShort"},
+		{"nl > short AND nl <= veryLong", "NoteLength > kShort AND NoteLength <= kVeryLong"},
+		{"nl == Short and nl == very short", "NoteLength == kShort AND NoteLength == kVeryShort"},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -156,9 +156,9 @@ func TestInput_ParseBranch(t *testing.T) {
 		expected string
 	}{
 		{" very short < NoteLength ", "NoteLength > kVeryShort"},
-		{"short < note length < long", "NoteLength > kShort && NoteLength < kLong"},
-		{"short < note length && note length < long", "NoteLength > kShort && NoteLength < kLong"},
-		{" very   short < note length && note length < veryLong ", "NoteLength > kVeryShort && NoteLength < kVeryLong"},
+		{"short < note length < long", "NoteLength > kShort AND NoteLength < kLong"},
+		{"short < note length and note length < long", "NoteLength > kShort AND NoteLength < kLong"},
+		{" very   short < note length and note length < veryLong ", "NoteLength > kVeryShort AND NoteLength < kVeryLong"},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

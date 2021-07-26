@@ -40,7 +40,6 @@ func (in Input) ParseBranch() (Condition, error) {
 }
 
 func (in Input) ParseClauseList() (Condition, error) {
-	connector := NoConjunction
 	clauses := make([]Clause, 0)
 	var rest = in
 	var err error
@@ -54,16 +53,12 @@ func (in Input) ParseClauseList() (Condition, error) {
 		if !rest.Empty() {
 			var c Conjunction
 			rest, c, err = rest.MustBeConjunction()
-			if err != nil {
-				return Condition{}, fmt.Errorf("AND or OR expected")
+			if err != nil || c != And {
+				return Condition{}, fmt.Errorf(`"AND"" expected`)
 			}
-			if connector != NoConjunction && c != connector {
-				return Condition{}, fmt.Errorf("inconsistent AND/OR combination")
-			}
-			connector = c
 		}
 	}
-	return Condition{connector, clauses}, nil
+	return Condition{And, clauses}, nil
 }
 
 func (in Input) ParseComparisonNoteLengthFirst() (Input, Clause, error) {

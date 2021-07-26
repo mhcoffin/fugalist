@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/mhcoffin/go-doricolib/doricolib"
+	"math"
 	"regexp"
 	"strconv"
 	"strings"
@@ -135,12 +136,14 @@ func proportion(num string, den string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("not a number: %s", den)
 	}
+	if n < 1 {
+		return "", fmt.Errorf("midi numerator must be >= 1: %d/%d", int(n), int(d))
+	}
 	if n > d {
 		return "", fmt.Errorf("fraction is not proper: %d/%d", int(n), int(d))
 	}
-	interval := 128 / d
-	point := (n-1)*interval + (interval / 2)
-	return fmt.Sprintf("%d", int(point)), nil
+	value := math.Round(((n - 0.5) / d) * 128.0)
+	return fmt.Sprintf("%d", int(value)), nil
 
 }
 
