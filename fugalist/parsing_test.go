@@ -183,3 +183,27 @@ func TestNote(t *testing.T) {
 		})
 	}
 }
+
+func TestCCMidiAction(t *testing.T) {
+	tests := []struct {
+		name string
+		input string
+		expected *doricolib.SwitchAction
+	}{
+		{"lower case", "cc3=12", &doricolib.SwitchAction{Type:   "kControlChange", Param1: "3", Param2: "12"}},
+		{"upper case", "CC3=12", &doricolib.SwitchAction{Type:   "kControlChange", Param1: "3", Param2: "12"}},
+		{"spaces", " CC 3 = 12 ", &doricolib.SwitchAction{Type:   "kControlChange", Param1: "3", Param2: "12"}},
+		{"spaces", " CC3=1/4", &doricolib.SwitchAction{Type:   "kControlChange", Param1: "3", Param2: "16"}},
+		{"spaces", " CC3=2/4", &doricolib.SwitchAction{Type:   "kControlChange", Param1: "3", Param2: "48"}},
+		{"spaces", " CC3=3/4", &doricolib.SwitchAction{Type:   "kControlChange", Param1: "3", Param2: "76"}},
+		{"spaces", " CC3=4/4", &doricolib.SwitchAction{Type:   "kControlChange", Param1: "3", Param2: "112"}},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			action, err := ParseMidi(test.input, 4)
+			assert.Nil(t, err)
+			assert.Equal(t, test.expected, action)
+		})
+	}
+}
+
