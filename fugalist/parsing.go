@@ -138,7 +138,7 @@ func proportion(num string, den string) (string, error) {
 	if n > d {
 		return "", fmt.Errorf("fraction is not proper: %d/%d", int(n), int(d))
 	}
-	interval := (n * 128) / d
+	interval := 128 / d
 	point := (n-1)*interval + (interval / 2)
 	return fmt.Sprintf("%d", int(point)), nil
 
