@@ -30,7 +30,7 @@ func (cond *Condition) String() string {
 	return strings.Join(clauses, conj)
 }
 
-func (in Input) ParseBranch() (Condition, error) {
+func (in Input) ParseBranchCondition() (Condition, error) {
 	cond, err := in.ParseRange()
 	if err == nil {
 		return cond, nil
