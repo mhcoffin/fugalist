@@ -4,7 +4,6 @@ import "C"
 import (
 	"fmt"
 	"github.com/mhcoffin/go-doricolib/doricolib"
-	"math"
 	"sort"
 	"strings"
 )
@@ -147,8 +146,10 @@ func CreateCombosForCompositeSound(techniques string, compositeSound *CompositeS
 		combo.ConditionString = cond.String()
 
 		// Note length.
-		// TODO: what if branch.Length is missing?
-		if math.IsNaN(branch.Length) {
+		// NB. If length factor is missing in the DB, reading it returns 0,
+		// which we take to mean missing since a length factor of zero is
+		// not very useful.
+		if branch.Length == 0 {
 			combo.Flags = 0
 		} else {
 			combo.Flags = 1
@@ -156,12 +157,9 @@ func CreateCombosForCompositeSound(techniques string, compositeSound *CompositeS
 		}
 
 		// Transpose
-		// TODO: what is branch.Transpose is missin?
-		if math.IsNaN(branch.Transpose) {
-			combo.Transpose = 0
-		} else {
-			combo.Transpose = int(branch.Transpose)
-		}
+		// NB. If transpose is missing in the DB, reading it returns 0,
+		// which is what we want anyway.
+		combo.Transpose = int(branch.Transpose)
 
 		combos[k] = combo
 		k++
