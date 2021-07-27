@@ -140,13 +140,14 @@ func CreateCombosForCompositeSound(techniques string, compositeSound *CompositeS
 		if err != nil {
 			return nil, fmt.Errorf("failed to create combo for vstSound: %w", err)
 		}
-		cond, err := Input(branch.Condition).ParseClauseList()
+		cond, err := Input(branch.Condition).ParseBranchCondition()
 		if err != nil {
 			return nil, fmt.Errorf(`failed to parse condition: "%s"`, branch.Condition)
 		}
 		combo.ConditionString = cond.String()
 
-		// Note length
+		// Note length.
+		// TODO: what if branch.Length is missing?
 		if math.IsNaN(branch.Length) {
 			combo.Flags = 0
 		} else {
@@ -155,6 +156,7 @@ func CreateCombosForCompositeSound(techniques string, compositeSound *CompositeS
 		}
 
 		// Transpose
+		// TODO: what is branch.Transpose is missin?
 		if math.IsNaN(branch.Transpose) {
 			combo.Transpose = 0
 		} else {

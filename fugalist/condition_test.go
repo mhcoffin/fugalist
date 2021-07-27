@@ -160,11 +160,12 @@ func TestInput_ParseBranch(t *testing.T) {
 		{"short < note length and note length < long", "NoteLength > kShort AND NoteLength < kLong"},
 		{" very   short < note length and note length < veryLong ", "NoteLength > kVeryShort AND NoteLength < kVeryLong"},
 		{"short <= noteLength < medium", "NoteLength >= kShort AND NoteLength < kMedium"},
+		{"short \u003c= noteLength  \u003c medium", "NoteLength >= kShort AND NoteLength < kMedium"},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			t.Run(test.name, func(t *testing.T) {
-				b, err := Input(test.name).ParseBranch()
+				b, err := Input(test.name).ParseBranchCondition()
 				assert.Nil(t, err)
 				assert.Equal(t, test.expected, b.String())
 			})
