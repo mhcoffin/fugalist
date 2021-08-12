@@ -56,13 +56,6 @@ func ParseActionList(s string, middleC string) ([]doricolib.SwitchAction, error)
 	return actions, nil
 }
 
-/*
-A midi action can be one of
-  CC n = m
-  KS n [= m]
-  PC n
-  [A-G]#? n
-*/
 var EmptyPat = regexp.MustCompile(`^\s*$`)
 var CcPat = regexp.MustCompile(`^\s*(?i:CC)\s*(\d+)\s*=\s*(\d+)\s*$`)
 var CCPartPat = regexp.MustCompile(`^\s*(?i:CC)\s*(\d+)\s*=\s*(\d+)\/(\d+)\s*$`)
@@ -72,7 +65,7 @@ var NotePat = regexp.MustCompile(`^\s*([A-Ga-g])([#b]?)\s*(-?\d+)\s*$`)
 
 func ParseMidi(part string, middleCOctave int) (*doricolib.SwitchAction, error) {
 	switch {
-	case EmptyPattern.MatchString(part):
+	case EmptyPat.MatchString(part):
 		return nil, nil
 	case CcPat.MatchString(part):
 		x := CcPat.FindStringSubmatch(part)
@@ -89,7 +82,7 @@ func ParseMidi(part string, middleCOctave int) (*doricolib.SwitchAction, error) 
 		}
 		return &doricolib.SwitchAction{
 			Type:   "kControlChange",
-			Param1: x[1],
+			Param1: x[0],
 			Param2: setting,
 		}, nil
 	case KsPat.MatchString(part):
@@ -104,7 +97,7 @@ func ParseMidi(part string, middleCOctave int) (*doricolib.SwitchAction, error) 
 			Param2: vel,
 		}, nil
 	case PcPat.MatchString(part):
-		x := KsPat.FindStringSubmatch(part)
+		x := PcPat.FindStringSubmatch(part)
 		return &doricolib.SwitchAction{
 			Type:   "kProgramChange",
 			Param1: x[1],
