@@ -70,6 +70,7 @@ func TestPcParser(t *testing.T) {
 		{"basic", "PC1", []string{"1"}},
 		{"ws", " pc 2", []string{"2"}},
 		{"lower case", " pc 2", []string{"2"}},
+		{"bug", "PC3", []string{"3"}},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
