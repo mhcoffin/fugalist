@@ -111,17 +111,18 @@ func TestFormatLengthFactor(t *testing.T) {
 	tests := []struct {
 		name     string
 		value    string
-		expected float64
+		flag int
+		expected string
 	}{
-		{"empty", "", 100},
-		{"one", "1.0", 100},
-		{"fraction", "0.85", 85},
-		{"zero", "0.0", 0},
-		{"larger", "1.05", 105},
+		{"empty", "", 0, ""},
+		{"one", "1.0", 1, "100"},
+		{"fraction", "0.85", 1, "85"},
+		{"zero", "0.0", 1, "0"},
+		{"larger", "1.05", 1, "105"},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			assert.Equal(t, test.expected, FormatLengthFactor(test.value))
+			assert.Equal(t, test.expected, FormatLengthFactor(test.value, test.flag))
 		})
 	}
 }
@@ -171,42 +172,42 @@ func TestBuildPtMap(t *testing.T) {
 					"NoteLength <= medium": {
 						On:    "KS25, PC6, CC1=64",
 						Dyn:   "velocity 1:127",
-						Len:   100,
-						Trans: 0,
+						Len:   "",
+						Trans: "0",
 					},
 					"NoteLength > medium": {
 						On:    "KS26, PC6, CC1=64",
 						Dyn:   "CC2 1:120",
-						Len:   95,
-						Trans: -1,
+						Len:   "95",
+						Trans: "-1",
 					},
 				},
 				"pt.marcato+pt.nonVibrato+pt.plucked": {
 					"": {
 						On:    "KS24, PC13, CC7=23",
 						Dyn:   "velocity 1:127",
-						Len:   100,
-						Trans: 0,
+						Len:   "",
+						Trans: "0",
 					},
 				},
 				"pt.natural": {
 					"NoteLength < medium": {
 						On:    "KS12=120, KS24, PC15, CC4=64",
 						Dyn:   "velocity 10:120",
-						Len:   100,
-						Trans: 0,
+						Len:   "",
+						Trans: "0",
 					},
 					"NoteLength >= long": {
 						On:    "KS12=120, KS24, PC13, CC4=64",
 						Dyn:   "CC2 10:120",
-						Len:   100,
-						Trans: 0,
+						Len:   "",
+						Trans: "0",
 					},
 					"NoteLength >= medium AND NoteLength < long": {
 						On:    "KS12=120, KS24, PC13, CC4=64",
 						Dyn:   "velocity 10:120",
-						Trans: 0,
-						Len:   100,
+						Trans: "0",
+						Len:   "",
 					},
 				},
 			},
@@ -221,3 +222,22 @@ func TestBuildPtMap(t *testing.T) {
 		})
 	}
 }
+
+func TestFindAxes(t *testing.T) {
+	tests := []struct {
+		name string
+		expected []string
+	}{
+		{"Ref", []string{"pt.plucked"}},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			xmap := readExpressionMap(fmt.Sprintf("test_input/%s.doricolib", test.name))
+			ptMap, err := BuildPtMap(*xmap)
+			assert.Nil(t, err)
+			extras := FindExtraTechniques(ptMap)
+			assert.Equal(t, []string{"pt.plucked"}, extras)
+		})
+	}
+}
+

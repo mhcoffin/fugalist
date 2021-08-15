@@ -13,8 +13,8 @@ type PlayData struct {
 	On    string
 	Off   string
 	Dyn   string
-	Len   float64
-	Trans float64
+	Len   string
+	Trans string
 }
 
 type BrMap map[string]PlayData
@@ -30,7 +30,7 @@ func BuildPtMap(xmap doricolib.ExpressionMap) (PtMap, error) {
 			On:    FormatMidiEvents(combo.SwitchOnActions.SwitchOnActions),
 			Off:   FormatMidiEvents(combo.SwitchOffActions.SwitchOffActions),
 			Dyn:   FormatMidiDynamic(combo.VolumeType, combo.VelocityRange),
-			Len:   FormatLengthFactor(combo.LengthFactor),
+			Len:   FormatLengthFactor(combo.LengthFactor, combo.Flags),
 			Trans: FormatTranspose(combo.Transpose),
 		}
 		branchMap, exists := result[tids]
@@ -56,16 +56,19 @@ func FormatBranch(br string) string {
 	return branchReplacer.Replace(br)
 }
 
-func FormatTranspose(transpose int) float64 {
-	return float64(transpose)
+func FormatTranspose(transpose int) string {
+	return fmt.Sprintf("%d", transpose)
 }
 
-func FormatLengthFactor(factor string) float64 {
+func FormatLengthFactor(factor string, flag int) string {
+	if flag == 0 {
+		return ""
+	}
 	fl, err := strconv.ParseFloat(factor, 32)
 	if err != nil {
-		return 100.0
+		return ""
 	}
-	return math.Round(fl * 100.0)
+	return fmt.Sprintf("%d", int(math.Round(fl * 100.0)))
 }
 
 func FormatMidiDynamic(volumeType doricolib.VolumeType, vrange string) string {
@@ -107,4 +110,72 @@ func CanonicalizeTechniqueString(tids string) string {
 	t := strings.Split(tids, "+")
 	sort.Strings(t)
 	return strings.Join(t, "+")
+}
+
+var usualPts = map[string]bool {
+	"pt.natural": true,
+	"pt.staccato": true,
+	"pt.staccatissimo": true,
+	"pt.tenuto": true,
+	"pt.portato": true,
+	"pt.legato": true,
+	"pt.marcato": true,
+	"pt.nonVibrato": true,
+}
+
+func FindExtraTechniques(ptMap PtMap) []string {
+	extras := []string{}
+	for key, _ := range ptMap {
+		pts := strings.Split(key, "+")
+		for _, pt := range pts {
+			if !usualPts[pt] {
+				extras = append(extras, pt)
+			}
+		}
+	}
+	return extras
+}
+
+func FindAxes(ptMap PtMap) []Axis {
+	result := []Axis {
+		{
+			Name:       "Length",
+			Techniques: []Technique{
+				{Name: "pt.normal"},
+				{Name: "pt.staccato"},
+				{Name: "pt.staccatissimo"},
+				{Name: "pt.tenuto"},
+				{Name: "pt.staccato-tenuto"},
+			},
+			SortOrder:  0,
+		},
+		{
+			Name: "Legato",
+			Techniques: []Technique{
+				{Name: "pt.normal"},
+				{Name: "pt.legato"},
+			},
+		},
+		{
+			Name: "Vibrato",
+			Techniques: []Technique{
+				{Name: "pt.normal"},
+				{Name: "pt.nonVibrato"},
+			},
+		},
+		{
+			Name: "Attack",
+			Techniques: []Technique{
+				{Name: "pt.normal"},
+				{Name: "pt.marcato"},
+			},
+		},
+		{
+			Name: "Techniques",
+			Techniques: []Technique{
+				{Name: "pt.normal"},
+			},
+		},
+	}
+	return result
 }
