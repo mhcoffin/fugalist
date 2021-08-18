@@ -6,6 +6,7 @@ import (
 	"github.com/mhcoffin/go-doricolib/doricolib"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
+	"strings"
 	"testing"
 )
 
@@ -111,7 +112,7 @@ func TestFormatLengthFactor(t *testing.T) {
 	tests := []struct {
 		name     string
 		value    string
-		flag int
+		flag     int
 		expected string
 	}{
 		{"empty", "", 0, ""},
@@ -131,16 +132,15 @@ func TestFormatTranspose(t *testing.T) {
 	tests := []struct {
 		name     string
 		value    int
-		expected float64
+		expected string
 	}{
-		{"empty", 0, 0.0},
-		{"empty", 1, 1.0},
-		{"empty", -1, -1.0},
+		{"empty", 0, "0"},
+		{"empty", 1, "1"},
+		{"empty", -1, "-1"},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.expected, FormatTranspose(test.value))
-
 		})
 	}
 }
@@ -216,28 +216,105 @@ func TestBuildPtMap(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			xmap := readExpressionMap(fmt.Sprintf("test_input/%s.doricolib", test.name))
-			ptMap, err := BuildPtMap(*xmap)
+			ptMap, err := BuildPtMap(xmap)
 			assert.Nil(t, err)
 			assert.Equal(t, test.expected, ptMap)
 		})
 	}
 }
 
-func TestFindAxes(t *testing.T) {
+func TestFindExtraTechniques(t *testing.T) {
 	tests := []struct {
-		name string
+		name     string
+		combos   []string
 		expected []string
 	}{
-		{"Ref", []string{"pt.plucked"}},
+		{"no extra", []string{"pt.staccato+pt.legato"}, []string{}},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			xmap := readExpressionMap(fmt.Sprintf("test_input/%s.doricolib", test.name))
-			ptMap, err := BuildPtMap(*xmap)
-			assert.Nil(t, err)
-			extras := FindExtraTechniques(ptMap)
-			assert.Equal(t, []string{"pt.plucked"}, extras)
+			extras := FindExtraTechniques(test.combos)
+			assert.Equal(t, test.expected, extras)
 		})
 	}
 }
 
+func TestBuildOccursWith(t *testing.T) {
+	tests := []struct {
+		name     string
+		combos   []string
+		negative []string
+		positive []string
+	}{
+		{
+			name: "disjoint",
+			combos: []string{
+				"pt.staccato+pt.legato+pt.marcato",
+				"pt.staccatissimo+pt.pizz",
+			},
+			negative: []string{
+				"pt.staccato", "pt.staccatissimo",
+				"pt.staccato", "pt.pizz",
+				"pt.pizz", "pt.staccato",
+			},
+			positive: []string{
+				"pt.staccato", "pt.legato",
+				"pt.legato", "pt.staccato",
+				"pt.staccatissimo", "pt.pizz",
+			},
+		},
+		{
+			name: "nontrivial",
+			combos: []string{
+				"pt.staccato+pt.marcato+pt.plucked",
+				"pt.plucked+pt.pizz",
+				"pt.pizz",
+				"pt.legato+pt.pizz",
+				"pt.staccato+pt.legato",
+			},
+			negative: []string{
+				"pt.staccato", "pt.pizz",
+				"pt.marcato", "pt.pizz",
+				"pt.pizz", "pt.marcato",
+			},
+			positive: []string{
+				"pt.staccato", "pt.plucked",
+				"pt.staccato", "pt.marcato",
+				"pt.plucked", "pt.pizz",
+				"pt.legato", "pt.pizz",
+				"pt.staccato", "pt.legato",
+			},
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			occursWith := BuildOccursWith(test.combos)
+			for k := 0; k < len(test.negative); k += 2 {
+				a := test.negative[k]
+				b := test.negative[k+1]
+				assert.False(t, occursWith(a, b), "%s %s", a, b)
+			}
+			for k := 0; k < len(test.positive); k += 2 {
+				a := test.positive[k]
+				b := test.positive[k+1]
+				assert.Truef(t, occursWith(a, b), "%s %s", a, b)
+			}
+		})
+	}
+}
+
+func addTechniques(axes []Axis, extras map[int]string) []Axis {
+	for key, value := range extras {
+		techniques := strings.Split(value, "+")
+		for _, id := range techniques {
+			if key >= len(axes) {
+				axes = append(axes, Axis{Name: Uniq(), Techniques: []Technique{
+					{Name: "Natural", Id: "pt.natural"},
+				}})
+			}
+			t := FugalistTechnique(id)
+			axes[key].Techniques = append(axes[key].Techniques, t)
+		}
+	}
+	return axes
+}

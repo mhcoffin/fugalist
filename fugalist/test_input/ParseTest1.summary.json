@@ -1,0 +1,17 @@
+{
+  "CreateTime": "2021-08-12T21:41:53.521Z",
+  "ModifyTime": "2021-08-12T21:52:20.102Z",
+  "ShareTime": "0001-01-01T00:00:00Z",
+  "ProjectID": "qHwIycm_PV",
+  "Version": 1,
+  "Name": "ParseTest1",
+  "Public": false,
+  "Description": "Desc",
+  "Plugins": "Foo",
+  "Vendor": "",
+  "Instruments": "",
+  "OtherTags": "",
+  "Examples": null,
+  "ExpressionMapURL": "https://firebasestorage.googleapis.com/v0/b/fugalist.appspot.com/o/Users%2F0636Wh6nIgYxdwDNX7Mf9oaVrSg1%2FqHwIycm_PV.doricolib?alt=media\u0026token=40daaef1-a917-4622-9335-7d016d48d3ed",
+  "ExpressionMapTime": "2021-08-17T21:30:42.55Z"
+}

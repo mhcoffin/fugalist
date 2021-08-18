@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/fugalist.iml" filepath="$PROJECT_DIR$/.idea/fugalist.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../go-doricolib/.idea/go-doricolib.iml" filepath="$PROJECT_DIR$/../go-doricolib/.idea/go-doricolib.iml" />
     </modules>
   </component>
 </project>

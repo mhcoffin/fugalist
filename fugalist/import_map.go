@@ -21,7 +21,7 @@ type BrMap map[string]PlayData
 
 type PtMap map[string]BrMap
 
-func BuildPtMap(xmap doricolib.ExpressionMap) (PtMap, error) {
+func BuildPtMap(xmap *doricolib.ExpressionMap) (PtMap, error) {
 	result := make(PtMap)
 	for _, combo := range xmap.Combinations.Combos {
 		tids := CanonicalizeTechniqueString(combo.TechniqueIDs)
@@ -68,7 +68,7 @@ func FormatLengthFactor(factor string, flag int) string {
 	if err != nil {
 		return ""
 	}
-	return fmt.Sprintf("%d", int(math.Round(fl * 100.0)))
+	return fmt.Sprintf("%d", int(math.Round(fl*100.0)))
 }
 
 func FormatMidiDynamic(volumeType doricolib.VolumeType, vrange string) string {
@@ -112,21 +112,21 @@ func CanonicalizeTechniqueString(tids string) string {
 	return strings.Join(t, "+")
 }
 
-var usualPts = map[string]bool {
-	"pt.natural": true,
-	"pt.staccato": true,
+var usualPts = map[string]bool{
+	"pt.natural":       true,
+	"pt.staccato":      true,
 	"pt.staccatissimo": true,
-	"pt.tenuto": true,
-	"pt.portato": true,
-	"pt.legato": true,
-	"pt.marcato": true,
-	"pt.nonVibrato": true,
+	"pt.tenuto":        true,
+	"pt.portato":       true,
+	"pt.legato":        true,
+	"pt.marcato":       true,
+	"pt.nonVibrato":    true,
 }
 
-func FindExtraTechniques(ptMap PtMap) []string {
+func FindExtraTechniques(combos []string) []string {
 	extras := []string{}
-	for key, _ := range ptMap {
-		pts := strings.Split(key, "+")
+	for _, combo := range combos {
+		pts := strings.Split(combo, "+")
 		for _, pt := range pts {
 			if !usualPts[pt] {
 				extras = append(extras, pt)
@@ -136,46 +136,162 @@ func FindExtraTechniques(ptMap PtMap) []string {
 	return extras
 }
 
-func FindAxes(ptMap PtMap) []Axis {
-	result := []Axis {
+func FugalistTechnique(id string) Technique {
+	if id == "pt.normal" {
+		return Technique{
+			Id:   Uniq(),
+			Name: "Normal",
+		}
+	}
+	doricoTechnique := doricolib.GetTechniqueById(id)
+	return Technique{Id: Uniq(), Name: doricoTechnique.Name}
+}
+
+// DefaultAxes returns a set of default axes with new unique IDs.
+func DefaultAxes() []Axis {
+	return []Axis{
 		{
-			Name:       "Length",
+			Name: "Length",
+			Id:   Uniq(),
 			Techniques: []Technique{
-				{Name: "pt.normal"},
-				{Name: "pt.staccato"},
-				{Name: "pt.staccatissimo"},
-				{Name: "pt.tenuto"},
-				{Name: "pt.staccato-tenuto"},
+				FugalistTechnique("pt.normal"),
+				FugalistTechnique("pt.staccato"),
+				FugalistTechnique("pt.staccatissimo"),
+				FugalistTechnique("pt.tenuto"),
+				FugalistTechnique("pt.portato"),
 			},
-			SortOrder:  0,
+			SortOrder: 0,
 		},
 		{
 			Name: "Legato",
+			Id:   Uniq(),
 			Techniques: []Technique{
-				{Name: "pt.normal"},
-				{Name: "pt.legato"},
+				FugalistTechnique("pt.normal"),
+				FugalistTechnique("pt.legato"),
 			},
+			SortOrder: 100,
 		},
 		{
 			Name: "Vibrato",
+			Id:   Uniq(),
 			Techniques: []Technique{
-				{Name: "pt.normal"},
-				{Name: "pt.nonVibrato"},
+				FugalistTechnique("pt.normal"),
+				FugalistTechnique("pt.nonVibrato"),
 			},
+			SortOrder: 200,
 		},
 		{
 			Name: "Attack",
+			Id:   Uniq(),
 			Techniques: []Technique{
-				{Name: "pt.normal"},
-				{Name: "pt.marcato"},
+				FugalistTechnique("pt.normal"),
+				FugalistTechnique("pt.marcato"),
 			},
+			SortOrder: 300,
 		},
 		{
-			Name: "Techniques",
+			Name: "Technique",
+			Id:   Uniq(),
 			Techniques: []Technique{
-				{Name: "pt.normal"},
+				FugalistTechnique("pt.normal"),
 			},
+			SortOrder: 400,
 		},
+	}
+}
+
+func BuildOccursWith(combos []string) func(a string, b string) bool {
+	mapping := make(map[string]map[string]bool)
+	for _, combo := range combos {
+		pts := strings.Split(combo, "+")
+		for _, pt := range pts {
+			m, present := mapping[pt]
+			if !present {
+				m = make(map[string]bool)
+				mapping[pt] = m
+			}
+			for _, other := range pts {
+				if pt != other {
+					m[other] = true
+				}
+			}
+		}
+	}
+	return func(a string, b string) bool {
+		return mapping[a] != nil && mapping[a][b]
+	}
+}
+
+// InterferesWith returns true if technique occurs with any technique in axis.
+func InterferesWith(axis Axis, technique Technique, occursWith func(a string, b string) bool) bool {
+	for _, tech := range axis.Techniques {
+		if occursWith(tech.Id, technique.Id) {
+			return true
+		}
+	}
+	return false
+}
+
+func FindAxes(combos []string) map[AxisId]Axis {
+	occursWith := BuildOccursWith(combos)
+
+	axes := DefaultAxes()
+	extras := FindExtraTechniques(combos)
+	sortOrder := 100.0
+outer:
+	for _, extra := range extras {
+		technique := FugalistTechnique(extra)
+		for k := 4; k < len(axes); k++ {
+			for _, t := range axes[k].Techniques {
+				if t.Id == technique.Id {
+					continue outer
+				}
+			}
+			if !InterferesWith(axes[k], technique, occursWith) {
+				axes[k].Techniques = append(axes[k].Techniques, technique)
+				continue outer
+			}
+		}
+		axes = append(axes, Axis{
+			Name:      Uniq(),
+			SortOrder: sortOrder,
+			Techniques: []Technique{
+				FugalistTechnique("pt.natural"),
+				technique,
+			},
+		})
+		sortOrder += 100
+	}
+	result := make(map[AxisId]Axis)
+	for _, a := range axes {
+		result[a.Id] = a
+	}
+	return result
+}
+
+func GetVstSounds(ptMap PtMap) map[VstSoundId]*VstSound {
+	vstSounds := make(map[VstSound]bool)
+
+	// Gather up the set of distinct (start, stop, dyn) tuples
+	for _, branchMap := range ptMap {
+		for _, sound := range branchMap {
+			vstSound := VstSound{
+				Midi:     sound.On,
+				Stop:     sound.Off,
+				Dynamics: sound.Dyn,
+			}
+			vstSounds[vstSound] = true
+		}
+	}
+
+	// Create a VstSound for each distinct tuple
+	vstCount := 0
+	result := make(map[VstSoundId]*VstSound)
+	for vstSound := range vstSounds {
+		vstCount++
+		vstSound.Id = Uniq()
+		vstSound.Name = fmt.Sprintf("vst-%d", vstCount)
+		result[vstSound.Id] = &vstSound
 	}
 	return result
 }

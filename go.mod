@@ -9,3 +9,5 @@ require (
 	github.com/mhcoffin/go-doricolib v0.5.1
 	github.com/stretchr/testify v1.5.1
 )
+
+replace github.com/mhcoffin/go-doricolib => ../go-doricolib
