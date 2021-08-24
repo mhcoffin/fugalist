@@ -9,7 +9,7 @@ type AssignmentRow = struct {
 type Table []AssignmentRow
 
 func CreateAssignmentTable(p *Project) (Table, error) {
-	axes := SortedAxes(p.Axes)
+	axes := p.SortedAxes()
 	size := GetSize(axes)
 	rows := make([]AssignmentRow, size)
 	for k := 0; k < size; k++ {

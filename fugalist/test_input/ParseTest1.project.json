@@ -1,0 +1,277 @@
+{
+  "ProjectId": "qHwIycm_PV",
+  "CreateTime": "2021-08-12T21:41:53.521Z",
+  "ModifyTime": "2021-08-17T21:29:43.463Z",
+  "Axes": {
+    "492Dd3feme": {
+      "Id": "492Dd3feme",
+      "Name": "Length",
+      "Techniques": [
+        {
+          "Id": "-VYVhYGg2g",
+          "Name": "Normal"
+        },
+        {
+          "Id": "YCmx_ZH7oy",
+          "Name": "Staccato"
+        },
+        {
+          "Id": "7Ht100qu_t",
+          "Name": "Staccatissimo"
+        },
+        {
+          "Id": "U-Kk29eAs6",
+          "Name": "Tenuto"
+        },
+        {
+          "Id": "YblZjpGN0Y",
+          "Name": "Staccato-tenuto"
+        }
+      ],
+      "SortOrder": 100
+    },
+    "Cg1YCVPO78": {
+      "Id": "Cg1YCVPO78",
+      "Name": "Vibrato",
+      "Techniques": [
+        {
+          "Id": "XflmBcK0o8",
+          "Name": "Normal"
+        },
+        {
+          "Id": "apG2jZlgk_",
+          "Name": "Non vibrato"
+        }
+      ],
+      "SortOrder": 300
+    },
+    "eSKTLFdU38": {
+      "Id": "eSKTLFdU38",
+      "Name": "Technique",
+      "Techniques": [
+        {
+          "Id": "5dYbEbQpZO",
+          "Name": "Normal"
+        }
+      ],
+      "SortOrder": 500
+    },
+    "qKIi2OF3Oa": {
+      "Id": "qKIi2OF3Oa",
+      "Name": "Legato",
+      "Techniques": [
+        {
+          "Id": "4pwe5MUGv1",
+          "Name": "Normal"
+        },
+        {
+          "Id": "e1wxUlFCjv",
+          "Name": "Legato"
+        }
+      ],
+      "SortOrder": 200
+    },
+    "v-XebVgVBC": {
+      "Id": "v-XebVgVBC",
+      "Name": "Attack",
+      "Techniques": [
+        {
+          "Id": "6XcWAraZaJ",
+          "Name": "Normal"
+        },
+        {
+          "Id": "qKNT2poSbR",
+          "Name": "Marcato"
+        }
+      ],
+      "SortOrder": 400
+    }
+  },
+  "VstSounds": {
+    "IGMGT2MO-4": {
+      "Id": "IGMGT2MO-4",
+      "Name": "leg",
+      "Midi": "ks0, C#2, PC3, CC4=6",
+      "Stop": "",
+      "Dynamics": "cc3"
+    },
+    "PwJpxRaHW8": {
+      "Id": "PwJpxRaHW8",
+      "Name": "sus",
+      "Midi": "c1,c2",
+      "Stop": "",
+      "Dynamics": "cc3 20:60"
+    },
+    "Umg_X6JE-V": {
+      "Id": "Umg_X6JE-V",
+      "Name": "stac",
+      "Midi": "c1,c#2",
+      "Stop": "",
+      "Dynamics": "cc3 10:80"
+    }
+  },
+  "Tints": {},
+  "CompositeSounds": {
+    "4XIuOsNvbN": {
+      "Id": "4XIuOsNvbN",
+      "Name": "Sustain",
+      "Branches": {
+        "Nlan0ynz9r": {
+          "Id": "Nlan0ynz9r",
+          "Order": 100,
+          "Condition": "NoteLength \u003c short",
+          "VstSoundId": "Umg_X6JE-V",
+          "Length": 0,
+          "Transpose": 0
+        },
+        "qhD-pJ7PPX": {
+          "Id": "qhD-pJ7PPX",
+          "Order": 200,
+          "Condition": "short \u003c= NoteLength",
+          "VstSoundId": "PwJpxRaHW8",
+          "Length": 0,
+          "Transpose": 0
+        }
+      },
+      "Order": 100
+    },
+    "m_IK8gCVv_": {
+      "Id": "m_IK8gCVv_",
+      "Name": "Port",
+      "Branches": {
+        "BDJSd5yC6_": {
+          "Id": "BDJSd5yC6_",
+          "Order": 100,
+          "Condition": "",
+          "VstSoundId": "PwJpxRaHW8",
+          "Length": 60,
+          "Transpose": 1
+        }
+      },
+      "Order": 100
+    }
+  },
+  "Assignments": {
+    "0_3EC5T5s8": {
+      "Sound": "PwJpxRaHW8"
+    },
+    "0n0sfJSPwW": {
+      "Sound": "4XIuOsNvbN"
+    },
+    "114BoYlWk2": {
+      "Sound": "PwJpxRaHW8"
+    },
+    "11JPwRDm_0": {
+      "Sound": "IGMGT2MO-4"
+    },
+    "4DbRKdKCo0": {
+      "Sound": "4XIuOsNvbN"
+    },
+    "4DqfSUsyy2": {
+      "Sound": "IGMGT2MO-4"
+    },
+    "5IUUg88tg_": {
+      "Sound": "PwJpxRaHW8"
+    },
+    "5RX89M9b8U": {
+      "Sound": "PwJpxRaHW8"
+    },
+    "8Rf-H4A867": {
+      "Sound": "IGMGT2MO-4"
+    },
+    "C-muZSw2h_": {
+      "Sound": "m_IK8gCVv_"
+    },
+    "CmlGEixA9U": {
+      "Sound": "IGMGT2MO-4"
+    },
+    "D0Ylr6gpz2": {
+      "Sound": "4XIuOsNvbN"
+    },
+    "D0przzGZp0": {
+      "Sound": "IGMGT2MO-4"
+    },
+    "HmtF_WMn77": {
+      "Sound": "PwJpxRaHW8"
+    },
+    "KQOVcTjz35": {
+      "Sound": "PwJpxRaHW8"
+    },
+    "OC71J-P9-0": {
+      "Sound": "PwJpxRaHW8"
+    },
+    "OCK7R2pNl2": {
+      "Sound": "IGMGT2MO-4"
+    },
+    "PJF_7Xfit8": {
+      "Sound": "IGMGT2MO-4"
+    },
+    "PQGWmneUxW": {
+      "Sound": "IGMGT2MO-4"
+    },
+    "S70DygDL8M": {
+      "Sound": "IGMGT2MO-4"
+    },
+    "Si3rvQC9gm": {
+      "Sound": "m_IK8gCVv_"
+    },
+    "Tp4uFx0Sos": {
+      "Sound": "IGMGT2MO-4"
+    },
+    "TpJgd4Siyu": {
+      "Sound": "4XIuOsNvbN"
+    },
+    "X78AIU_s6j": {
+      "Sound": "PwJpxRaHW8"
+    },
+    "aNfQqRR42h": {
+      "Sound": "PwJpxRaHW8"
+    },
+    "efb_n0bGku": {
+      "Sound": "IGMGT2MO-4"
+    },
+    "efqw-992_s": {
+      "Sound": "PwJpxRaHW8"
+    },
+    "fNXTQlsfwO": {
+      "Sound": "IGMGT2MO-4"
+    },
+    "fUU7NVtpsk": {
+      "Sound": "IGMGT2MO-4"
+    },
+    "h6tqT-dj3h": {
+      "Sound": "IGMGT2MO-4"
+    },
+    "k6lppLgExO": {
+      "Sound": "4XIuOsNvbN"
+    },
+    "kjmB07hytk": {
+      "Sound": "PwJpxRaHW8"
+    },
+    "loYKGTxt-s": {
+      "Sound": "IGMGT2MO-4"
+    },
+    "lopEeaXdlu": {
+      "Sound": "PwJpxRaHW8"
+    },
+    "oe7akWe5zu": {
+      "Sound": "IGMGT2MO-4"
+    },
+    "oeKU8f4Jps": {
+      "Sound": "4XIuOsNvbN"
+    },
+    "pMG5LOPQ9M": {
+      "Sound": "PwJpxRaHW8"
+    },
+    "pVFRW_Omhm": {
+      "Sound": "PwJpxRaHW8"
+    },
+    "sMO6x6y37j": {
+      "Sound": "IGMGT2MO-4"
+    },
+    "xn8vl9vo25": {
+      "Sound": "IGMGT2MO-4"
+    }
+  },
+  "MiddleC": "C4"
+}

@@ -8,12 +8,12 @@ import (
 	"strings"
 )
 
-func CreateExpressionMap(summary ProjectSummary, p *Project) (*doricolib.ExpressionMap, error) {
-	combos, err := CreateCombinations(p)
+func (p *Project) CreateExpressionMap(summary ProjectSummary) (*doricolib.ExpressionMap, error) {
+	combos, err := p.CreateComboList()
 	if err != nil {
 		return nil, fmt.Errorf("failed to create combinations: %w", err)
 	}
-	addOns, err := CreateTechniqueAddOns(p)
+	addOns, err := p.CreateTechniqueAddOns()
 	if err != nil {
 		return nil, fmt.Errorf("failed to create addOns: %w", err)
 	}
@@ -43,8 +43,8 @@ func CreateExpressionMap(summary ProjectSummary, p *Project) (*doricolib.Express
 	return &em, nil
 }
 
-func CreateCombinations(p *Project) (*doricolib.PlayingTechniqueCombinationList, error) {
-	combos, err := CreateCombos(p)
+func (p *Project) CreateComboList() (*doricolib.PlayingTechniqueCombinationList, error) {
+	combos, err := p.CreateCombos()
 	if err != nil {
 		return nil, err
 	}
@@ -56,9 +56,9 @@ func CreateCombinations(p *Project) (*doricolib.PlayingTechniqueCombinationList,
 }
 
 // CreateCombos creates the list of playing technique combinations.
-func CreateCombos(p *Project) ([]*doricolib.PlayingTechniqueCombination, error) {
+func (p *Project) CreateCombos() ([]*doricolib.PlayingTechniqueCombination, error) {
 	r := make([]*doricolib.PlayingTechniqueCombination, 0)
-	axes := SortedAxes(p.Axes)
+	axes := p.SortedAxes()
 	size := GetSize(axes)
 	for k := 0; k < size; k++ {
 		techniques, err := GetCombinationString(axes, k)
@@ -167,12 +167,10 @@ func CreateCombosForCompositeSound(techniques string, compositeSound *CompositeS
 	return combos, nil
 }
 
-func SortedAxes(axes map[string]Axis) []Axis {
-	result := make([]Axis, len(axes))
-	k := 0
-	for _, axis := range axes {
-		result[k] = axis
-		k++
+func (p *Project) SortedAxes() []Axis {
+	result := make([]Axis, 0, len(p.Axes))
+	for _, axis := range p.Axes {
+		result = append(result, axis)
 	}
 	sort.Slice(result, func(a, b int) bool { return result[a].SortOrder < result[b].SortOrder })
 	return result
@@ -250,7 +248,7 @@ func rangeString(limits []string) string {
 	return limits[0] + "," + limits[1]
 }
 
-func CreateTechniqueAddOns(p *Project) (*doricolib.TechniqueAddOnList, error) {
+func (p *Project) CreateTechniqueAddOns() (*doricolib.TechniqueAddOnList, error) {
 	addOns := make([]doricolib.TechniqueAddOn, len(p.Tints))
 	k := 0
 	for _, modifier := range p.Tints {

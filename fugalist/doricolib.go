@@ -23,7 +23,7 @@ func CreateDoricoLib(uid string, pid string) (*doricolib.ScoreLib, error) {
 	if err != nil {
 		log.Fatalf("failed: %s", err)
 	}
-	xmap, err := CreateExpressionMap(*projectSummary, project)
+	xmap, err := project.CreateExpressionMap(*projectSummary)
 	if err != nil {
 		log.Fatal(err)
 	}
