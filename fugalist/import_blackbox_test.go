@@ -11,6 +11,15 @@ import (
 	"testing"
 )
 
+// These tests work as follows:
+// Read an expression map (xml) to create doricolib.ScoreLib
+// Pull out the expression map
+// Convert some part of the expression map into a fugalist type (Axis, etc.)
+// Test by
+//   - converting the fugalist thing into a doricolib thing
+//   - comparing to the original
+//
+
 func ReadDoricolib(t *testing.T, name string) *doricolib.ScoreLib {
 	bytes, err := ioutil.ReadFile(fmt.Sprintf("test_input/%s.doricolib", name))
 	if err != nil {
@@ -117,23 +126,4 @@ func vstSoundsByName(vstSoundsById map[VstSoundId]*VstSound) map[string]*VstSoun
 func assertEqualVstSounds(t *testing.T, expected map[VstSoundId]*VstSound, actual map[VstSoundId]*VstSound) {
 	assert.Equal(t, len(expected), len(actual))
 	assert.Equal(t, expected, actual)
-}
-
-func TestGetVstSounds(t *testing.T) {
-	tests := []struct {
-		name string
-	}{
-		{"ParseTest1"},
-	}
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			score := ReadDoricolib(t, test.name)
-			xmap := getXmap(score)
-			ptMap := getPtMap(t, xmap)
-			vstSounds := GetVstSounds(ptMap)
-
-			project := ReadProject(t, test.name)
-			assertEqualVstSounds(t, project.VstSounds, vstSounds)
-		})
-	}
 }

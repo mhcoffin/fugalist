@@ -208,7 +208,7 @@ func TestInput_MustBeConjunction(t *testing.T) {
 		expected Conjunction
 		ok       bool
 	}{
-		{" && NL < very short", And, true},
+		{" and NL < very short", And, true},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

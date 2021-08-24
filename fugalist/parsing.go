@@ -104,7 +104,7 @@ func ParseMidi(part string, middleCOctave int) (*doricolib.SwitchAction, error) 
 			Param2: vel,
 		}, nil
 	case PcPat.MatchString(part):
-		x := KsPat.FindStringSubmatch(part)
+		x := PcPat.FindStringSubmatch(part)
 		return &doricolib.SwitchAction{
 			Type:   "kProgramChange",
 			Param1: x[1],

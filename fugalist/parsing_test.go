@@ -195,7 +195,7 @@ func TestCCMidiAction(t *testing.T) {
 		{"spaces", " CC 3 = 12 ", &doricolib.SwitchAction{Type: "kControlChange", Param1: "3", Param2: "12"}},
 		{"spaces", " CC3=1/4", &doricolib.SwitchAction{Type: "kControlChange", Param1: "3", Param2: "16"}},
 		{"spaces", " CC3=2/4", &doricolib.SwitchAction{Type: "kControlChange", Param1: "3", Param2: "48"}},
-		{"spaces", " CC3=3/4", &doricolib.SwitchAction{Type: "kControlChange", Param1: "3", Param2: "76"}},
+		{"spaces", " CC3=3/4", &doricolib.SwitchAction{Type: "kControlChange", Param1: "3", Param2: "80"}},
 		{"spaces", " CC3=4/4", &doricolib.SwitchAction{Type: "kControlChange", Param1: "3", Param2: "112"}},
 	}
 	for _, test := range tests {
